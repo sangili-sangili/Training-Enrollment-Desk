@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { EnrollmentProvider, useEnrollment } from './context/EnrollmentContext.jsx';
 import { ROUTES } from './routes.js';
 import { Sidebar, Header, MobileNav } from '../components/layout/index.js';
-import { ToastContainer, ProfileModal } from '../components/feedback/index.js';
+import { ToastContainer, ProfileModal, ConflictModal } from '../components/feedback/index.js';
 import { DashboardView } from '../features/dashboard/index.js';
+import { EnrollView } from '../features/enrollment/index.js';
 import { LoginView } from '../features/authentication/index.js';
 
 function ViewShellPlaceholder({ title, description, badgeText }) {
@@ -78,14 +79,7 @@ function MainContent() {
         <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-20 md:pb-8">
           <div className="max-w-7xl mx-auto space-y-6">
             {activeTab === ROUTES.DASHBOARD && <DashboardView />}
-
-            {activeTab === ROUTES.ENROLL && (
-              <ViewShellPlaceholder
-                title="Enroll People"
-                description="Participant registration form with auto-normalization, session multi-selection, and conflict diagnostics."
-                badgeText="Screen 3"
-              />
-            )}
+            {activeTab === ROUTES.ENROLL && <EnrollView />}
 
             {activeTab === ROUTES.SESSIONS && (
               <ViewShellPlaceholder
@@ -129,6 +123,9 @@ function MainContent() {
 
       {/* Profile Update Modal */}
       <ProfileModal />
+
+      {/* Session Conflict Diagnostic Modal */}
+      <ConflictModal />
 
       {/* Floating Notifications */}
       <ToastContainer />

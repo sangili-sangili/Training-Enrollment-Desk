@@ -167,10 +167,15 @@ export function createEnrollments({
         isCandidateBeingConfirmed: true
       });
 
+      const resolvedSessionDate = (typeof sessionDate === 'string' && sessionDate !== 'ALL')
+        ? sessionDate
+        : (sessionDate instanceof Date ? sessionDate.toISOString().split('T')[0] : '2025-04-28');
+
       const newEnrollment = {
         id: generateUniqueId('ENR'),
         personId: person.id,
         sessionId,
+        sessionDate: resolvedSessionDate,
         status: 'Confirmed',
         enrolledAt: nowIso,
         confirmedAt: nowIso,
@@ -198,11 +203,16 @@ export function createEnrollments({
         });
       }
     } else {
+      const resolvedSessionDate = (typeof sessionDate === 'string' && sessionDate !== 'ALL')
+        ? sessionDate
+        : (sessionDate instanceof Date ? sessionDate.toISOString().split('T')[0] : '2025-04-28');
+
       // Waitlisted registration (₹0 charge)
       const newEnrollment = {
         id: generateUniqueId('ENR'),
         personId: person.id,
         sessionId,
+        sessionDate: resolvedSessionDate,
         status: 'Waitlisted',
         enrolledAt: nowIso,
         confirmedAt: null,

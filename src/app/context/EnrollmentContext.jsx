@@ -144,8 +144,46 @@ export function EnrollmentProvider({ children }) {
     }
   });
   const [sessions] = useState(SESSION_DEFINITIONS);
-  const [trainingDate, setTrainingDate] = useState('2025-04-28');
-  const [activeTab, setActiveTab] = useState(ROUTES.DASHBOARD);
+  const [trainingDate, setTrainingDate] = useState('ALL');
+
+  // Synchronize active navigation tab with URL hash and localStorage to prevent redirect on reload
+  const [activeTab, setActiveTabState] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash.replace(/^#/, '').toLowerCase();
+      if (Object.values(ROUTES).includes(hash)) {
+        return hash;
+      }
+      try {
+        const saved = window.localStorage.getItem('TED_ACTIVE_TAB');
+        if (saved && Object.values(ROUTES).includes(saved)) {
+          return saved;
+        }
+      } catch {}
+    }
+    return ROUTES.DASHBOARD;
+  });
+
+  const setActiveTab = useCallback((tab) => {
+    setActiveTabState(tab);
+    if (typeof window !== 'undefined') {
+      try {
+        window.location.hash = tab;
+        window.localStorage.setItem('TED_ACTIVE_TAB', tab);
+      } catch {}
+    }
+  }, []);
+
+  // Listen for browser navigation (Back / Forward buttons)
+  useEffect(() => {
+    function handleHashChange() {
+      const hash = window.location.hash.replace(/^#/, '').toLowerCase();
+      if (Object.values(ROUTES).includes(hash)) {
+        setActiveTabState(hash);
+      }
+    }
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   // Derived enrollments filtered by chosen trainingDate
   const activeEnrollments = useMemo(() => {
@@ -204,14 +242,15 @@ export function EnrollmentProvider({ children }) {
   }, []);
 
   // Action: Create enrollment
-  const handleEnroll = useCallback((personInput, sessionIds) => {
+  const handleEnroll = useCallback((personInput, sessionIds, targetCohortDate) => {
+    const chosenDate = targetCohortDate || (trainingDate === 'ALL' ? '2025-04-28' : trainingDate);
     const result = createEnrollments({
       personInput,
       sessionIds,
       people,
       enrollments,
       sessions,
-      sessionDate: trainingDate,
+      sessionDate: chosenDate,
       nowIso: new Date().toISOString()
     });
 
