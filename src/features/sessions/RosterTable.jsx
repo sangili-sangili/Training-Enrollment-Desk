@@ -64,6 +64,8 @@ export function RosterTable({
   enrollments = [],
   people = [],
   sessions = [],
+  peopleMap: propPeopleMap,
+  sessionsMap: propSessionsMap,
   onViewPrice,
   onCancelClick,
   onAcceptOffer,
@@ -73,22 +75,24 @@ export function RosterTable({
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
-  // Build lookup maps for O(1) row rendering
+  // Use passed lookup maps or build memoized fallback for O(1) row rendering
   const peopleMap = useMemo(() => {
+    if (propPeopleMap) return propPeopleMap;
     const map = new Map();
     for (let i = 0; i < people.length; i++) {
       map.set(people[i].id, people[i]);
     }
     return map;
-  }, [people]);
+  }, [propPeopleMap, people]);
 
   const sessionsMap = useMemo(() => {
+    if (propSessionsMap) return propSessionsMap;
     const map = new Map();
     for (let i = 0; i < sessions.length; i++) {
       map.set(sessions[i].id, sessions[i]);
     }
     return map;
-  }, [sessions]);
+  }, [propSessionsMap, sessions]);
 
   // Pagination calculation
   const totalItems = enrollments.length;

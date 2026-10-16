@@ -54,7 +54,7 @@ const SESSION_STYLES = {
  * Matches Figma design with exact icons, counts, and prominent animated striped progress bars
  */
 export function CapacityProgressPanel() {
-  const { enrollments, activeEnrollments, sessions, setActiveTab, trainingDate } = useEnrollment();
+  const { enrollments, activeEnrollments, sessions, setActiveTab } = useEnrollment();
   const currentEnrollments = activeEnrollments ?? enrollments;
 
   // Memoize occupancy map computation to avoid recalculation on unrelated renders

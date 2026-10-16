@@ -92,7 +92,7 @@ export function SessionCardsRow() {
         const stats = statsMap[session.id] || { confirmed: 0, offered: 0, waitlisted: 0 };
         const occupied = stats.confirmed + stats.offered;
         const occupancyRate = Math.min(100, Math.round((occupied / session.capacity) * 100));
-        const visual = SESSION_VISUALS[session.id] || SESSION_VISUALS['session-1'];
+        const visual = SESSION_VISUALS[session.id] || SESSION_VISUALS['SES-HTML'];
         const isSelected = selectedSessionFilter === session.id;
 
         return (

@@ -311,6 +311,8 @@ export function SessionsView() {
         enrollments={filteredEnrollments}
         people={people}
         sessions={sessions}
+        peopleMap={peopleMap}
+        sessionsMap={sessionsMap}
         onViewPrice={handleViewPrice}
         onCancelClick={handleOpenCancelModal}
         onAcceptOffer={handleAcceptOffer}

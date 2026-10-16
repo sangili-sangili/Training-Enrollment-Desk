@@ -1,14 +1,13 @@
 import { useMemo } from 'react';
 import { useEnrollment } from '../../app/context/EnrollmentContext.jsx';
 import { TOTAL_DESK_CAPACITY } from '../../domain/sessions/sessionDefinitions.js';
-import { getAllSessionsOccupancy } from '../../domain/enrollment/capacityGuards.js';
 
 /**
  * 4 Top Metric Stat Cards matching Figma Design
  * Left circular solid color badge + right stats and trend pill
  */
 export function StatCardsGrid() {
-  const { people, enrollments, activeEnrollments, activePeople, sessions, trainingDate } = useEnrollment();
+  const { people, enrollments, activeEnrollments, activePeople, trainingDate } = useEnrollment();
 
   // Pure derived calculations driven by active date filter, memoized for high-performance rendering
   const stats = useMemo(() => {
@@ -16,14 +15,22 @@ export function StatCardsGrid() {
     const currentPeople = activePeople ?? people;
 
     const totalPeopleCount = currentPeople.length;
-    const confirmedCount = currentEnrollments.filter(e => e.status === 'Confirmed').length;
-    const waitlistedCount = currentEnrollments.filter(e => e.status === 'Waitlisted').length;
+    let confirmedCount = 0;
+    let waitlistedCount = 0;
+    let totalOccupiedSeats = 0;
 
-    const occupancyBySession = getAllSessionsOccupancy(currentEnrollments, sessions);
-    const totalOccupiedSeats = Object.values(occupancyBySession).reduce(
-      (acc, o) => acc + o.occupiedSeats,
-      0
-    );
+    for (let i = 0; i < currentEnrollments.length; i++) {
+      const status = currentEnrollments[i].status;
+      if (status === 'Confirmed') {
+        confirmedCount++;
+        totalOccupiedSeats++;
+      } else if (status === 'Offered') {
+        totalOccupiedSeats++;
+      } else if (status === 'Waitlisted') {
+        waitlistedCount++;
+      }
+    }
+
     // In Figma mockup, Available Seats shows 14 out of 24 total (or computed)
     const computedAvailable = Math.max(0, TOTAL_DESK_CAPACITY - totalOccupiedSeats);
     const availableSeatsCount = (trainingDate === '2025-04-28' && totalOccupiedSeats === 17) ? 14 : computedAvailable;
@@ -106,7 +113,7 @@ export function StatCardsGrid() {
       )
     }
   ];
-  }, [activeEnrollments, enrollments, activePeople, people, sessions, trainingDate]);
+  }, [activeEnrollments, enrollments, activePeople, people, trainingDate]);
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useEnrollment } from '../../app/context/EnrollmentContext.jsx';
 import { ROUTES } from '../../app/routes.js';
 
@@ -89,7 +89,7 @@ export function Header({ onToggleMobileMenu }) {
     }
   ]);
 
-  const unreadCount = notifications.filter(n => n.unread).length;
+  const unreadCount = useMemo(() => notifications.filter(n => n.unread).length, [notifications]);
 
   const markAllAsRead = useCallback(() => {
     setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
