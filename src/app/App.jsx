@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { EnrollmentProvider, useEnrollment } from './context/EnrollmentContext.jsx';
 import { ROUTES } from './routes.js';
 import { Sidebar, Header, MobileNav } from '../components/layout/index.js';
-import { ToastContainer, ProfileModal, ConflictModal } from '../components/feedback/index.js';
+import { ToastContainer, ProfileModal, ConflictModal, PriceBreakdownModal } from '../components/feedback/index.js';
 import { DashboardView } from '../features/dashboard/index.js';
 import { EnrollView } from '../features/enrollment/index.js';
+import { SessionsView } from '../features/sessions/index.js';
 import { LoginView } from '../features/authentication/index.js';
 
 function ViewShellPlaceholder({ title, description, badgeText }) {
@@ -81,13 +82,7 @@ function MainContent() {
             {activeTab === ROUTES.DASHBOARD && <DashboardView />}
             {activeTab === ROUTES.ENROLL && <EnrollView />}
 
-            {activeTab === ROUTES.SESSIONS && (
-              <ViewShellPlaceholder
-                title="Session Management"
-                description="Interactive session cards, status filters, and participant roster table with waitlist promotion triggers."
-                badgeText="Screen 4"
-              />
-            )}
+            {activeTab === ROUTES.SESSIONS && <SessionsView />}
 
             {activeTab === ROUTES.PEOPLE && (
               <ViewShellPlaceholder
@@ -126,6 +121,9 @@ function MainContent() {
 
       {/* Session Conflict Diagnostic Modal */}
       <ConflictModal />
+
+      {/* Tuition & Pricing Breakdown Modal */}
+      <PriceBreakdownModal />
 
       {/* Floating Notifications */}
       <ToastContainer />
