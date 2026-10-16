@@ -14,8 +14,7 @@ import {
   validateStatusTransition
 } from '../src/domain/enrollment/enrollmentValidator.js';
 import {
-  getSessionOccupancy,
-  getAllSessionsOccupancy
+  getSessionOccupancy
 } from '../src/domain/enrollment/capacityGuards.js';
 import {
   calculateCalendarDaysDifference,
@@ -26,15 +25,13 @@ import {
   isEligibleForCompanyDiscount
 } from '../src/domain/pricing/companyDiscount.js';
 import {
-  calculatePriceBreakdown,
-  recalculateCompanyEnrollmentPrices
+  calculatePriceBreakdown
 } from '../src/domain/pricing/priceBreakdown.js';
 import {
   getWaitlistedCandidatesForSession,
   findOldestEligibleWaitlistCandidate
 } from '../src/domain/waitlist/waitlistQueue.js';
 import {
-  createSeatOffer,
   acceptSeatOffer,
   declineSeatOffer
 } from '../src/domain/waitlist/offerLifecycle.js';

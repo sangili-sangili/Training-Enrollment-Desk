@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { loadStorageData, saveStorageData, resetStorageData } from '../../services/storage/index.js';
 import { SESSION_DEFINITIONS } from '../../domain/sessions/sessionDefinitions.js';
 import { createEnrollments, cancelEnrollment } from '../../domain/enrollment/enrollmentLifecycle.js';
@@ -8,12 +8,165 @@ import { ROUTES } from '../routes.js';
 const EnrollmentContext = createContext(null);
 
 export function EnrollmentProvider({ children }) {
-  // Load persisted state or fallback to seed
-  const [people, setPeople] = useState([]);
-  const [enrollments, setEnrollments] = useState([]);
+  // Theme state: 'light' or 'dark'
+  const [theme, setTheme] = useState(() => {
+    try {
+      return window.localStorage.getItem('TED_THEME') || 'light';
+    } catch {
+      return 'light';
+    }
+  });
+
+  const applyThemeToDOM = (themeMode) => {
+    try {
+      const root = document.documentElement;
+      const body = document.body;
+      if (themeMode === 'dark') {
+        root.classList.add('dark');
+        root.setAttribute('data-theme', 'dark');
+        if (body) {
+          body.classList.add('dark');
+          body.setAttribute('data-theme', 'dark');
+        }
+      } else {
+        root.classList.remove('dark');
+        root.removeAttribute('data-theme');
+        if (body) {
+          body.classList.remove('dark');
+          body.removeAttribute('data-theme');
+        }
+      }
+    } catch {
+      // safe fallback
+    }
+  };
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('TED_THEME', theme);
+    } catch {}
+    applyThemeToDOM(theme);
+  }, [theme]);
+
+  const toggleTheme = useCallback(() => {
+    setTheme(prev => {
+      const next = prev === 'light' ? 'dark' : 'light';
+      try {
+        window.localStorage.setItem('TED_THEME', next);
+      } catch {}
+      applyThemeToDOM(next);
+      return next;
+    });
+  }, []);
+
+  // Authentication State
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    try {
+      const storedAuth = window.localStorage.getItem('TED_AUTH');
+      return storedAuth ? JSON.parse(storedAuth) : true; // Default logged in for ease of use
+    } catch {
+      return true;
+    }
+  });
+
+  const [operator, setOperator] = useState(() => {
+    try {
+      const storedOp = window.localStorage.getItem('TED_OPERATOR');
+      return storedOp ? JSON.parse(storedOp) : {
+        fullName: 'Admin Coordinator',
+        email: 'admin@training.com',
+        role: 'Desk Administrator'
+      };
+    } catch {
+      return {
+        fullName: 'Admin Coordinator',
+        email: 'admin@training.com',
+        role: 'Desk Administrator'
+      };
+    }
+  });
+
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+
+  const login = useCallback((credentials) => {
+    // Default demo credentials
+    const validEmail = 'admin@training.com';
+    const validPassword = 'admin';
+
+    const inputEmail = (credentials.email || '').trim().toLowerCase();
+    const inputPassword = credentials.password || '';
+
+    // Allow admin credentials or standard admin123
+    if ((inputEmail === validEmail || inputEmail === 'admin') && (inputPassword === validPassword || inputPassword === 'admin123')) {
+      setIsAuthenticated(true);
+      try {
+        window.localStorage.setItem('TED_AUTH', 'true');
+      } catch {}
+      return { success: true };
+    }
+
+    return {
+      success: false,
+      error: 'Invalid email or password. Use demo credentials: admin@training.com / admin123'
+    };
+  }, []);
+
+  const logout = useCallback(() => {
+    setIsAuthenticated(false);
+    try {
+      window.localStorage.setItem('TED_AUTH', 'false');
+    } catch {}
+  }, []);
+
+  const updateProfile = useCallback((newProfile) => {
+    setOperator(prev => {
+      const updated = { ...prev, ...newProfile };
+      try {
+        window.localStorage.setItem('TED_OPERATOR', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  }, []);
+
+  // Core enrollment data initialized eagerly from localStorage (0 waterfall re-renders)
+  const [people, setPeople] = useState(() => {
+    try {
+      return loadStorageData().people;
+    } catch {
+      return [];
+    }
+  });
+  const [enrollments, setEnrollments] = useState(() => {
+    try {
+      return loadStorageData().enrollments;
+    } catch {
+      return [];
+    }
+  });
   const [sessions] = useState(SESSION_DEFINITIONS);
-  const [trainingDate, setTrainingDate] = useState('2026-11-10');
+  const [trainingDate, setTrainingDate] = useState('2025-04-28');
   const [activeTab, setActiveTab] = useState(ROUTES.DASHBOARD);
+
+  // Derived enrollments filtered by chosen trainingDate
+  const activeEnrollments = useMemo(() => {
+    if (trainingDate === 'ALL') {
+      return enrollments;
+    }
+    // Match Figma baseline date ('2025-04-28') or standard cohort ('2026-11-10') or explicit matching sessionDate
+    if (trainingDate === '2025-04-28' || trainingDate === '2026-11-10') {
+      return enrollments.filter(e => !e.sessionDate || e.sessionDate === trainingDate || e.sessionDate === '2026-11-10' || e.sessionDate === '2025-04-28');
+    }
+    return enrollments.filter(e => e.sessionDate === trainingDate);
+  }, [enrollments, trainingDate]);
+
+  // Derived unique people filtered by active enrollments
+  const activePeople = useMemo(() => {
+    if (trainingDate === 'ALL' || trainingDate === '2025-04-28' || trainingDate === '2026-11-10') {
+      return people;
+    }
+    const personIds = new Set(activeEnrollments.map(e => e.personId));
+    return people.filter(p => personIds.has(p.id));
+  }, [people, activeEnrollments, trainingDate]);
 
   // Global filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -21,8 +174,8 @@ export function EnrollmentProvider({ children }) {
   const [selectedStatusFilter, setSelectedStatusFilter] = useState('ALL');
 
   // Modals state
-  const [conflictModalData, setConflictModalData] = useState(null); // { title, message, conflictingSession }
-  const [priceModalData, setPriceModalData] = useState(null); // { enrollment, person, session }
+  const [conflictModalData, setConflictModalData] = useState(null);
+  const [priceModalData, setPriceModalData] = useState(null);
 
   // Toast notifications queue
   const [toasts, setToasts] = useState([]);
@@ -31,7 +184,7 @@ export function EnrollmentProvider({ children }) {
     const id = `toast-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
     const newToast = {
       id,
-      type: toast.type || 'info', // 'success' | 'warning' | 'error' | 'info'
+      type: toast.type || 'info',
       title: toast.title,
       message: toast.message,
       duration: toast.duration || 4000
@@ -41,13 +194,6 @@ export function EnrollmentProvider({ children }) {
 
   const removeToast = useCallback((id) => {
     setToasts(prev => prev.filter(t => t.id !== id));
-  }, []);
-
-  // Hydrate on mount
-  useEffect(() => {
-    const loaded = loadStorageData();
-    setPeople(loaded.people);
-    setEnrollments(loaded.enrollments);
   }, []);
 
   // Synchronize state mutations to localStorage
@@ -223,9 +369,20 @@ export function EnrollmentProvider({ children }) {
     });
   }, [addToast]);
 
-  const value = {
+  const value = useMemo(() => ({
+    theme,
+    toggleTheme,
+    isAuthenticated,
+    operator,
+    login,
+    logout,
+    updateProfile,
+    profileModalOpen,
+    setProfileModalOpen,
     people,
     enrollments,
+    activeEnrollments,
+    activePeople,
     sessions,
     trainingDate,
     setTrainingDate,
@@ -249,7 +406,43 @@ export function EnrollmentProvider({ children }) {
     setConflictModalData,
     priceModalData,
     setPriceModalData
-  };
+  }), [
+    theme,
+    toggleTheme,
+    isAuthenticated,
+    operator,
+    login,
+    logout,
+    updateProfile,
+    profileModalOpen,
+    people,
+    enrollments,
+    activeEnrollments,
+    activePeople,
+    sessions,
+    trainingDate,
+    setTrainingDate,
+    activeTab,
+    setActiveTab,
+    searchQuery,
+    setSearchQuery,
+    selectedSessionFilter,
+    setSelectedSessionFilter,
+    selectedStatusFilter,
+    setSelectedStatusFilter,
+    toasts,
+    addToast,
+    removeToast,
+    handleEnroll,
+    handleCancelEnrollment,
+    handleAcceptOffer,
+    handleDeclineOffer,
+    handleResetData,
+    conflictModalData,
+    setConflictModalData,
+    priceModalData,
+    setPriceModalData
+  ]);
 
   return (
     <EnrollmentContext.Provider value={value}>

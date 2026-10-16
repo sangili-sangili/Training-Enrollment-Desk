@@ -2,21 +2,22 @@ import { useState } from 'react';
 import { EnrollmentProvider, useEnrollment } from './context/EnrollmentContext.jsx';
 import { ROUTES } from './routes.js';
 import { Sidebar, Header, MobileNav } from '../components/layout/index.js';
-import { ToastContainer } from '../components/feedback/index.js';
-
+import { ToastContainer, ProfileModal } from '../components/feedback/index.js';
 import { DashboardView } from '../features/dashboard/index.js';
+import { LoginView } from '../features/authentication/index.js';
+
 function ViewShellPlaceholder({ title, description, badgeText }) {
   return (
-    <div className="bg-white border border-[#E2E8F0] rounded-xl p-8 shadow-xs">
+    <div className="bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-2xl p-8 shadow-xs">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-xl font-bold text-[#0F172A]">{title}</h2>
+        <h2 className="text-xl font-bold text-[#0F172A] dark:text-white">{title}</h2>
         {badgeText && (
-          <span className="text-xs font-semibold px-2.5 py-1 bg-teal-50 text-[#009688] rounded-full border border-teal-200">
+          <span className="text-xs font-semibold px-2.5 py-1 bg-teal-50 dark:bg-teal-950/60 text-[#009688] dark:text-teal-400 rounded-full border border-teal-200 dark:border-teal-800">
             {badgeText}
           </span>
         )}
       </div>
-      <p className="text-sm text-[#64748B] max-w-2xl leading-relaxed">
+      <p className="text-sm text-[#64748B] dark:text-slate-400 max-w-2xl leading-relaxed">
         {description}
       </p>
     </div>
@@ -24,11 +25,27 @@ function ViewShellPlaceholder({ title, description, badgeText }) {
 }
 
 function MainContent() {
-  const { activeTab, handleResetData } = useEnrollment();
+  const { activeTab, handleResetData, isAuthenticated, theme } = useEnrollment();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // If unauthenticated (e.g. operator logged out), show Login Screen with credentials
+  if (!isAuthenticated) {
+    return (
+      <div className={theme === 'dark' ? 'dark' : ''} data-theme={theme}>
+        <LoginView />
+        <ToastContainer />
+      </div>
+    );
+  }
+
   return (
-    <div className="flex h-screen overflow-hidden bg-[#F8FAFC]">
+    <div
+      id="app-root"
+      data-theme={theme}
+      className={`flex h-screen overflow-hidden ${
+        theme === 'dark' ? 'dark bg-[#0B132B] text-slate-100' : 'bg-[#F8FAFC] text-[#0F172A]'
+      } transition-colors`}
+    >
       {/* Desktop / Tablet Sidebar */}
       <Sidebar className="hidden md:flex" />
 
@@ -87,16 +104,16 @@ function MainContent() {
             )}
 
             {activeTab === ROUTES.SETTINGS && (
-              <div className="bg-white border border-[#E2E8F0] rounded-xl p-8 shadow-xs space-y-4">
-                <h2 className="text-xl font-bold text-[#0F172A]">Workspace Settings</h2>
-                <p className="text-sm text-[#64748B]">
+              <div className="bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-2xl p-8 shadow-xs space-y-4">
+                <h2 className="text-xl font-bold text-[#0F172A] dark:text-white">Workspace Settings</h2>
+                <p className="text-sm text-[#64748B] dark:text-slate-400">
                   Reset development storage back to baseline seed fixtures (24 people, 18 confirmed, 6 waitlisted).
                 </p>
                 <div>
                   <button
                     type="button"
                     onClick={handleResetData}
-                    className="px-4 py-2 text-sm font-semibold rounded-lg bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 transition-colors"
+                    className="px-4 py-2 text-sm font-semibold rounded-xl bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50 border border-red-200 dark:border-red-800 transition-colors"
                   >
                     Reset Storage to Default Seed Fixtures
                   </button>
@@ -109,6 +126,9 @@ function MainContent() {
         {/* Mobile Bottom Navigation */}
         <MobileNav />
       </div>
+
+      {/* Profile Update Modal */}
+      <ProfileModal />
 
       {/* Floating Notifications */}
       <ToastContainer />

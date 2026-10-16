@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
@@ -46,8 +48,116 @@
   background: #94A3B8;
 }
 
-/* Subtle focus ring style */
-:focus-visible {
-  outline: 2px solid #009688;
-  outline-offset: 2px;
+/* ========================================================
+   BULLETPROOF DARK BLUE THEME (#0B132B Canvas & #131F37 Card)
+   ======================================================== */
+:root {
+  --canvas-bg: #F8FAFC;
+  --card-bg: #FFFFFF;
+  --card-border: #E2E8F0;
+  --text-main: #0F172A;
+  --text-muted: #64748B;
+  --nav-hover: #F1F5F9;
+}
+
+html.dark,
+body.dark,
+.dark,
+[data-theme="dark"] {
+  --canvas-bg: #0B132B !important;
+  --card-bg: #131F37 !important;
+  --card-border: #1E3150 !important;
+  --text-main: #FFFFFF !important;
+  --text-muted: #94A3B8 !important;
+  --nav-hover: #172745 !important;
+  color-scheme: dark;
+}
+
+html.dark,
+body.dark,
+.dark,
+[data-theme="dark"],
+html.dark body {
+  background-color: #0B132B !important;
+  color: #F1F5F9 !important;
+}
+
+/* Fallback direct style overrides for dark mode surfaces */
+.dark .bg-white,
+[data-theme="dark"] .bg-white {
+  background-color: #131F37 !important;
+}
+
+.dark .bg-\[\#F8FAFC\],
+[data-theme="dark"] .bg-\[\#F8FAFC\] {
+  background-color: #0B132B !important;
+}
+
+.dark .border-\[\#E2E8F0\],
+[data-theme="dark"] .border-\[\#E2E8F0\],
+.dark .border-slate-200,
+[data-theme="dark"] .border-slate-200 {
+  border-color: #1E3150 !important;
+}
+
+.dark .text-\[\#0F172A\],
+[data-theme="dark"] .text-\[\#0F172A\] {
+  color: #FFFFFF !important;
+}
+
+.dark .text-\[\#64748B\],
+[data-theme="dark"] .text-\[\#64748B\] {
+  color: #94A3B8 !important;
+}
+
+.dark .text-\[\#475569\],
+[data-theme="dark"] .text-\[\#475569\] {
+  color: #CBD5E1 !important;
+}
+
+.dark .bg-\[\#F1F5F9\],
+[data-theme="dark"] .bg-\[\#F1F5F9\],
+.dark .bg-slate-50,
+[data-theme="dark"] .bg-slate-50 {
+  background-color: #1A2844 !important;
+}
+
+/* High-contrast animated striped progress bar */
+@keyframes stripes-move {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 40px 0;
+  }
+}
+
+.striped-progress-bar {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.35) 0,
+    rgba(255, 255, 255, 0.35) 12px,
+    transparent 12px,
+    transparent 24px
+  );
+  background-size: 40px 40px;
+  animation: stripes-move 1.2s linear infinite;
+  will-change: background-position;
+  transform: translateZ(0);
+}
+
+/* Smooth card transitions & hover lift with GPU promotion */
+.hover-lift {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+  will-change: transform, box-shadow;
+  transform: translateZ(0);
+}
+
+.hover-lift:hover {
+  transform: translateY(-3px) translateZ(0);
+  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.08), 0 4px 8px -4px rgba(0, 0, 0, 0.03);
+}
+
+.dark .hover-lift:hover {
+  box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.6), 0 6px 12px -4px rgba(11, 19, 43, 0.5);
 }

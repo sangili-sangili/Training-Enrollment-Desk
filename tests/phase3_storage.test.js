@@ -13,7 +13,7 @@ global.window = {
 };
 
 import { SESSION_DEFINITIONS, TOTAL_DESK_CAPACITY, getSessionById } from '../src/domain/sessions/sessionDefinitions.js';
-import { SEED_PEOPLE, SEED_ENROLLMENTS, INITIAL_STORAGE_PAYLOAD } from '../src/data/seedFixtures.js';
+import { SEED_PEOPLE, SEED_ENROLLMENTS } from '../src/data/seedFixtures.js';
 import { validateStorageSchema } from '../src/services/storage/schemaValidator.js';
 import {
   loadStorageData,
