@@ -1,57 +1,131 @@
 import { useState } from 'react';
-import { ROUTES } from './routes';
+import { EnrollmentProvider, useEnrollment } from './context/EnrollmentContext.jsx';
+import { ROUTES } from './routes.js';
+import { Sidebar, Header, MobileNav } from '../components/layout/index.js';
+import { ToastContainer } from '../components/feedback/index.js';
 
-/**
- * Root Application Container
- * Foundation scaffold for Training Enrollment Desk
- */
-export default function App() {
-  const [activeTab, setActiveTab] = useState(ROUTES.DASHBOARD);
+// Placeholder / View stubs for initial shell integration
+function ViewShellPlaceholder({ title, description, badgeText }) {
+  return (
+    <div className="bg-white border border-[#E2E8F0] rounded-xl p-8 shadow-xs">
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-xl font-bold text-[#0F172A]">{title}</h2>
+        {badgeText && (
+          <span className="text-xs font-semibold px-2.5 py-1 bg-teal-50 text-[#009688] rounded-full border border-teal-200">
+            {badgeText}
+          </span>
+        )}
+      </div>
+      <p className="text-sm text-[#64748B] max-w-2xl leading-relaxed">
+        {description}
+      </p>
+    </div>
+  );
+}
+
+function MainContent() {
+  const { activeTab, handleResetData } = useEnrollment();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] font-sans antialiased">
-      <header className="bg-white border-b border-[#E2E8F0] px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 rounded-lg bg-[#009688] flex items-center justify-center text-white font-bold text-sm shadow-sm">
-            TED
-          </div>
-          <h1 className="text-lg font-semibold tracking-tight text-[#0F172A]">
-            Training Enrollment Desk
-          </h1>
-        </div>
-        <div className="text-xs text-[#64748B] font-medium bg-[#F1F5F9] px-2.5 py-1 rounded-full border border-[#E2E8F0]">
-          Active View: {activeTab}
-        </div>
-      </header>
+    <div className="flex h-screen overflow-hidden bg-[#F8FAFC]">
+      {/* Desktop / Tablet Sidebar */}
+      <Sidebar className="hidden md:flex" />
 
-      <main className="max-w-7xl mx-auto p-6">
-        <div className="bg-white border border-[#E2E8F0] rounded-xl p-8 shadow-sm">
-          <h2 className="text-xl font-semibold text-[#0F172A] mb-2">
-            Module Architecture Established
-          </h2>
-          <p className="text-sm text-[#64748B] mb-6">
-            Phase 2 architectural scaffolding and module boundaries configured successfully. Ready for Phase 3 data foundation.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="p-4 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0]">
-              <div className="text-xs font-semibold text-[#009688] uppercase tracking-wider mb-1">Domain</div>
-              <div className="text-sm font-medium text-[#0F172A]">Sessions, Enrollment, Pricing, Waitlist</div>
-            </div>
-            <div className="p-4 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0]">
-              <div className="text-xs font-semibold text-[#009688] uppercase tracking-wider mb-1">Services</div>
-              <div className="text-sm font-medium text-[#0F172A]">LocalStorage, Schema Validation</div>
-            </div>
-            <div className="p-4 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0]">
-              <div className="text-xs font-semibold text-[#009688] uppercase tracking-wider mb-1">Features</div>
-              <div className="text-sm font-medium text-[#0F172A]">Dashboard, Enroll, Sessions, People</div>
-            </div>
-            <div className="p-4 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0]">
-              <div className="text-xs font-semibold text-[#009688] uppercase tracking-wider mb-1">Components</div>
-              <div className="text-sm font-medium text-[#0F172A]">UI Atoms, Layout, Modals, Feedback</div>
-            </div>
+      {/* Mobile Drawer Overlay */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-40 md:hidden flex">
+          <div
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          <div className="relative flex flex-col w-64 bg-[#0d2830] z-50">
+            <Sidebar className="w-full h-full" />
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              className="absolute top-4 right-4 text-slate-300 hover:text-white p-1"
+              aria-label="Close menu"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
         </div>
-      </main>
+      )}
+
+      {/* Main Area */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <Header onToggleMobileMenu={() => setMobileMenuOpen(true)} />
+
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-20 md:pb-8">
+          <div className="max-w-7xl mx-auto space-y-6">
+            {activeTab === ROUTES.DASHBOARD && (
+              <ViewShellPlaceholder
+                title="Dashboard Overview"
+                description="Live metrics, session occupancy progress bars, and upcoming training session streams. Ready for Screen 2 implementation."
+                badgeText="Screen 1 Active"
+              />
+            )}
+
+            {activeTab === ROUTES.ENROLL && (
+              <ViewShellPlaceholder
+                title="Enroll People"
+                description="Participant registration form with auto-normalization, session multi-selection, and conflict diagnostics."
+                badgeText="Screen 3"
+              />
+            )}
+
+            {activeTab === ROUTES.SESSIONS && (
+              <ViewShellPlaceholder
+                title="Session Management"
+                description="Interactive session cards, status filters, and participant roster table with waitlist promotion triggers."
+                badgeText="Screen 4"
+              />
+            )}
+
+            {activeTab === ROUTES.PEOPLE && (
+              <ViewShellPlaceholder
+                title="Trainee Directory"
+                description="Unique participant records, total investment, and session history."
+                badgeText="Screen 5"
+              />
+            )}
+
+            {activeTab === ROUTES.SETTINGS && (
+              <div className="bg-white border border-[#E2E8F0] rounded-xl p-8 shadow-xs space-y-4">
+                <h2 className="text-xl font-bold text-[#0F172A]">Workspace Settings</h2>
+                <p className="text-sm text-[#64748B]">
+                  Reset development storage back to baseline seed fixtures (24 people, 18 confirmed, 6 waitlisted).
+                </p>
+                <div>
+                  <button
+                    type="button"
+                    onClick={handleResetData}
+                    className="px-4 py-2 text-sm font-semibold rounded-lg bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 transition-colors"
+                  >
+                    Reset Storage to Default Seed Fixtures
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </main>
+
+        {/* Mobile Bottom Navigation */}
+        <MobileNav />
+      </div>
+
+      {/* Floating Notifications */}
+      <ToastContainer />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <EnrollmentProvider>
+      <MainContent />
+    </EnrollmentProvider>
   );
 }

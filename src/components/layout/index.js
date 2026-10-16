@@ -1,6 +1,3 @@
-/**
- * Layout Components
- * Structural shell components: Header, Sidebar, MobileNav.
- */
-
-export const LAYOUT_COMPONENTS_LAYER = 'components/layout';
+export * from './Sidebar.jsx';
+export * from './Header.jsx';
+export * from './MobileNav.jsx';
