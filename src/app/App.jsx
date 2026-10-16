@@ -4,7 +4,7 @@ import { ROUTES } from './routes.js';
 import { Sidebar, Header, MobileNav } from '../components/layout/index.js';
 import { ToastContainer } from '../components/feedback/index.js';
 
-// Placeholder / View stubs for initial shell integration
+import { DashboardView } from '../features/dashboard/index.js';
 function ViewShellPlaceholder({ title, description, badgeText }) {
   return (
     <div className="bg-white border border-[#E2E8F0] rounded-xl p-8 shadow-xs">
@@ -60,13 +60,7 @@ function MainContent() {
 
         <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-20 md:pb-8">
           <div className="max-w-7xl mx-auto space-y-6">
-            {activeTab === ROUTES.DASHBOARD && (
-              <ViewShellPlaceholder
-                title="Dashboard Overview"
-                description="Live metrics, session occupancy progress bars, and upcoming training session streams. Ready for Screen 2 implementation."
-                badgeText="Screen 1 Active"
-              />
-            )}
+            {activeTab === ROUTES.DASHBOARD && <DashboardView />}
 
             {activeTab === ROUTES.ENROLL && (
               <ViewShellPlaceholder
