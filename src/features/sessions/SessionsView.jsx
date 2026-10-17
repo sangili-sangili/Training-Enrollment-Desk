@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
-import { useEnrollment } from '../../app/context/EnrollmentContext.jsx';
+import { useEnrollment } from '../../app/context/useEnrollment.js';
 import { ROUTES } from '../../app/routes.js';
 import { calculatePriceBreakdown } from '../../domain/pricing/priceBreakdown.js';
 import { SessionCardsRow } from './SessionCardsRow.jsx';
@@ -7,24 +7,7 @@ import { RosterFilterToolbar } from './RosterFilterToolbar.jsx';
 import { RosterTable } from './RosterTable.jsx';
 import { CancelEnrollmentModal } from './CancelEnrollmentModal.jsx';
 
-/**
- * Helper to format date string to "Mon DD, YYYY"
- */
-function formatDateLabel(dateStr) {
-  if (!dateStr || dateStr === 'ALL') return 'All Dates';
-  if (dateStr === '2025-04-28') return 'Apr 28, 2025';
-
-  try {
-    const [year, month, day] = dateStr.split('-');
-    if (year && month && day) {
-      const d = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10));
-      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    }
-    return dateStr;
-  } catch {
-    return dateStr;
-  }
-}
+import { formatDateLabel } from '../../utils/formatters.js';
 
 /**
  * Screen 4: Session Management & Participant Roster Table

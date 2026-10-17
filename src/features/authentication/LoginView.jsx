@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useEnrollment } from '../../app/context/EnrollmentContext.jsx';
+import { useEnrollment } from '../../app/context/useEnrollment.js';
 
 /**
  * Operator Sign In Screen

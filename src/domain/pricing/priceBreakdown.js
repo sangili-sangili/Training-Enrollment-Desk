@@ -1,6 +1,7 @@
 import { getSessionById } from '../sessions/sessionDefinitions.js';
 import { isEligibleForEarlyBird, EARLY_BIRD_DISCOUNT_PERCENT, EARLY_BIRD_RATE } from './earlyBirdCalculator.js';
 import { isEligibleForCompanyDiscount, COMPANY_DISCOUNT_PERCENT, COMPANY_DISCOUNT_RATE } from './companyDiscount.js';
+import { normalizeCompany } from '../enrollment/enrollmentValidator.js';
 
 /**
  * Calculate pricing breakdown for an enrollment
@@ -114,13 +115,16 @@ export function recalculateCompanyEnrollmentPrices({
   enrollments = [],
   people = []
 }) {
+  const normTargetCompany = normalizeCompany(company);
+  if (!normTargetCompany) return enrollments;
+
   return enrollments.map(enr => {
     if (enr.sessionId !== sessionId || enr.status !== 'Confirmed') {
       return enr;
     }
 
     const person = people.find(p => p.id === enr.personId);
-    if (!person || person.company !== company) {
+    if (!person || normalizeCompany(person.company) !== normTargetCompany) {
       return enr;
     }
 

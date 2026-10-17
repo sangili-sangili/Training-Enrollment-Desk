@@ -1,11 +1,10 @@
-import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { loadStorageData, saveStorageData, resetStorageData } from '../../services/storage/index.js';
 import { SESSION_DEFINITIONS } from '../../domain/sessions/sessionDefinitions.js';
 import { createEnrollments, cancelEnrollment } from '../../domain/enrollment/enrollmentLifecycle.js';
 import { acceptSeatOffer, declineSeatOffer } from '../../domain/waitlist/offerLifecycle.js';
 import { ROUTES } from '../routes.js';
-
-const EnrollmentContext = createContext(null);
+import { EnrollmentContext } from './enrollmentContextDef.js';
 
 export function EnrollmentProvider({ children }) {
   // Theme state: 'light' or 'dark'
@@ -495,10 +494,4 @@ export function EnrollmentProvider({ children }) {
   );
 }
 
-export function useEnrollment() {
-  const context = useContext(EnrollmentContext);
-  if (!context) {
-    throw new Error('useEnrollment must be used within an EnrollmentProvider');
-  }
-  return context;
-}
+export default EnrollmentProvider;

@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useEnrollment } from '../../app/context/EnrollmentContext.jsx';
+import { useEnrollment } from '../../app/context/useEnrollment.js';
 
 /**
  * Filter and Search Toolbar for the Participant Roster

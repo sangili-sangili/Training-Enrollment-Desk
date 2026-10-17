@@ -1,5 +1,5 @@
 import { ROUTES, NAV_ITEMS } from '../../app/routes.js';
-import { useEnrollment } from '../../app/context/EnrollmentContext.jsx';
+import { useEnrollment } from '../../app/context/useEnrollment.js';
 
 /**
  * Main Desktop & Tablet Sidebar Navigation

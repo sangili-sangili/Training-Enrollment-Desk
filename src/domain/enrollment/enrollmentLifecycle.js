@@ -119,15 +119,12 @@ export function createEnrollments({
     person = updatedPeople.find(p => p.id === person.id);
   }
 
-  let updatedEnrollments = [...enrollments];
-  const newlyConfirmed = [];
-  const newlyWaitlisted = [];
+  // 3. Pre-validate all requested sessions for duplicates and conflicts (Atomic Transaction)
   const conflicts = [];
   const errors = [];
 
   for (const sessionId of sessionIds) {
-    // 3. Prevent duplicate active enrollment in same session
-    const existingSameSession = updatedEnrollments.find(e =>
+    const existingSameSession = enrollments.find(e =>
       e.personId === person.id &&
       e.sessionId === sessionId &&
       e.status !== 'Cancelled'
@@ -135,21 +132,41 @@ export function createEnrollments({
 
     if (existingSameSession) {
       errors.push(`Participant is already ${existingSameSession.status.toLowerCase()} in this session.`);
-      continue;
     }
 
-    // 4. Check schedule conflict against existing confirmed/offered sessions
-    const conflictCheck = checkPersonScheduleConflict(sessionId, person.id, updatedEnrollments, sessions);
+    const conflictCheck = checkPersonScheduleConflict(sessionId, person.id, enrollments, sessions);
     if (conflictCheck.hasConflict) {
       conflicts.push({
         sessionId,
         conflictingSession: conflictCheck.conflictingSession
       });
-      errors.push(`Schedule conflict with confirmed seat in ${conflictCheck.conflictingSession.title}.`);
-      continue;
+      errors.push(`Schedule conflict: "${conflictCheck.conflictingSession.title}" conflicts with selected session.`);
     }
+  }
 
-    // 5. Evaluate capacity
+  // If any conflicts or duplicate errors exist, abort immediately with zero mutations
+  if (conflicts.length > 0 || errors.length > 0) {
+    return {
+      success: false,
+      updatedPeople: people,
+      updatedEnrollments: enrollments,
+      newlyConfirmed: [],
+      newlyWaitlisted: [],
+      conflicts,
+      errors
+    };
+  }
+
+  // 4. All sessions are valid; proceed with enrollment allocation
+  const resolvedSessionDate = (typeof sessionDate === 'string' && sessionDate !== 'ALL')
+    ? sessionDate
+    : (sessionDate instanceof Date ? sessionDate.toISOString().split('T')[0] : '2025-04-28');
+
+  let updatedEnrollments = [...enrollments];
+  const newlyConfirmed = [];
+  const newlyWaitlisted = [];
+
+  for (const sessionId of sessionIds) {
     const occupancy = getSessionOccupancy(sessionId, updatedEnrollments, sessions);
     const hasSeat = occupancy.availableSeats > 0;
 
@@ -166,10 +183,6 @@ export function createEnrollments({
         candidatePersonId: person.id,
         isCandidateBeingConfirmed: true
       });
-
-      const resolvedSessionDate = (typeof sessionDate === 'string' && sessionDate !== 'ALL')
-        ? sessionDate
-        : (sessionDate instanceof Date ? sessionDate.toISOString().split('T')[0] : '2025-04-28');
 
       const newEnrollment = {
         id: generateUniqueId('ENR'),
@@ -203,11 +216,15 @@ export function createEnrollments({
         });
       }
     } else {
-      const resolvedSessionDate = (typeof sessionDate === 'string' && sessionDate !== 'ALL')
-        ? sessionDate
-        : (sessionDate instanceof Date ? sessionDate.toISOString().split('T')[0] : '2025-04-28');
-
       // Waitlisted registration (₹0 charge)
+      const baseBreakdown = calculatePriceBreakdown({
+        sessionId,
+        referenceDate: nowIso,
+        sessionDate,
+        company: person.company,
+        status: 'Waitlisted'
+      });
+
       const newEnrollment = {
         id: generateUniqueId('ENR'),
         personId: person.id,
@@ -218,7 +235,7 @@ export function createEnrollments({
         confirmedAt: null,
         offeredAt: null,
         cancelledAt: null,
-        originalPrice: calculatePriceBreakdown({ sessionId, referenceDate: nowIso, sessionDate, company: person.company, status: 'Waitlisted' }).originalPrice,
+        originalPrice: baseBreakdown.originalPrice,
         finalPrice: 0,
         appliedDiscount: 'NONE',
         discountPercent: 0,
@@ -231,16 +248,14 @@ export function createEnrollments({
     }
   }
 
-  const success = (newlyConfirmed.length > 0 || newlyWaitlisted.length > 0) && conflicts.length === 0;
-
   return {
-    success,
+    success: newlyConfirmed.length > 0 || newlyWaitlisted.length > 0,
     updatedPeople,
     updatedEnrollments,
     newlyConfirmed,
     newlyWaitlisted,
-    conflicts,
-    errors
+    conflicts: [],
+    errors: []
   };
 }
 

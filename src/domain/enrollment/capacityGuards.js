@@ -20,11 +20,18 @@ export function getSessionOccupancy(sessionId, enrollments = [], sessions = []) 
   const session = sessions.find(s => s.id === sessionId) || getSessionById(sessionId);
   const capacity = session ? session.capacity : 0;
 
-  const sessionEnrollments = enrollments.filter(e => e.sessionId === sessionId);
+  let confirmedCount = 0;
+  let offeredCount = 0;
+  let waitlistedCount = 0;
 
-  const confirmedCount = sessionEnrollments.filter(e => e.status === 'Confirmed').length;
-  const offeredCount = sessionEnrollments.filter(e => e.status === 'Offered').length;
-  const waitlistedCount = sessionEnrollments.filter(e => e.status === 'Waitlisted').length;
+  for (let i = 0; i < enrollments.length; i++) {
+    const enr = enrollments[i];
+    if (enr.sessionId === sessionId) {
+      if (enr.status === 'Confirmed') confirmedCount++;
+      else if (enr.status === 'Offered') offeredCount++;
+      else if (enr.status === 'Waitlisted') waitlistedCount++;
+    }
+  }
 
   const occupiedSeats = confirmedCount + offeredCount;
   const availableSeats = Math.max(0, capacity - occupiedSeats);

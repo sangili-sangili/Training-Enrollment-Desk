@@ -1,17 +1,25 @@
-import { useState } from 'react';
-import { useEnrollment } from '../../app/context/EnrollmentContext.jsx';
+import { useState, useEffect } from 'react';
+import { useEnrollment } from '../../app/context/useEnrollment.js';
 import { Button } from '../ui/Button.jsx';
 
 /**
- * Profile Update Modal
- * Allows coordinator to update their name and email
+ * Inner dialog component that mounts cleanly when modal is opened.
+ * Eliminates synchronous setState inside useEffect.
  */
-export function ProfileModal() {
-  const { operator, updateProfile, profileModalOpen, setProfileModalOpen, addToast } = useEnrollment();
+function ProfileModalContent() {
+  const { operator, updateProfile, setProfileModalOpen, addToast } = useEnrollment();
   const [fullName, setFullName] = useState(operator.fullName || '');
   const [email, setEmail] = useState(operator.email || '');
 
-  if (!profileModalOpen) return null;
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.key === 'Escape') {
+        setProfileModalOpen(false);
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [setProfileModalOpen]);
 
   const handleSave = (e) => {
     e.preventDefault();
@@ -46,7 +54,8 @@ export function ProfileModal() {
           <button
             type="button"
             onClick={() => setProfileModalOpen(false)}
-            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg"
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg cursor-pointer"
+            aria-label="Close modal"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -93,6 +102,16 @@ export function ProfileModal() {
       </div>
     </div>
   );
+}
+
+/**
+ * Profile Update Modal
+ * Mounts dialog only when active
+ */
+export function ProfileModal() {
+  const { profileModalOpen } = useEnrollment();
+  if (!profileModalOpen) return null;
+  return <ProfileModalContent />;
 }
 
 export default ProfileModal;

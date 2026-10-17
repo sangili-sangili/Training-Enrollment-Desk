@@ -1,4 +1,4 @@
-import { useEnrollment } from '../../app/context/EnrollmentContext.jsx';
+import { useEnrollment } from '../../app/context/useEnrollment.js';
 
 /**
  * Course Catalog & Business Rules Reference Card

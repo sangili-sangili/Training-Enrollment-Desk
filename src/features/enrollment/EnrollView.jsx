@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { useEnrollment } from '../../app/context/EnrollmentContext.jsx';
+import { useEnrollment } from '../../app/context/useEnrollment.js';
 import { getAllSessionsOccupancy } from '../../domain/enrollment/capacityGuards.js';
 import { normalizeEmail } from '../../domain/enrollment/enrollmentValidator.js';
 import { checkBatchInternalConflict, checkPersonScheduleConflict } from '../../domain/sessions/sessionOverlap.js';
@@ -7,76 +7,33 @@ import { TraineeForm } from './TraineeForm.jsx';
 import { SessionChecklist } from './SessionChecklist.jsx';
 import { SelectedSummaryCard } from './SelectedSummaryCard.jsx';
 import { ROUTES } from '../../app/routes.js';
+import { getTodayIsoDate } from '../../utils/formatters.js';
 
 /**
- * Helper to get current local date in YYYY-MM-DD
+ * Interactive enrollment form workflow
+ * Uses key prop to reset state on prefilled trainee changes cleanly without setState inside useEffect
  */
-function getTodayIsoDate() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
-
-/**
- * Screen 2 / 3: Enroll People View
- * Comprehensive enrollment desk interface with real-time seat availability,
- * schedule conflict warnings, and automatic discount evaluation.
- */
-export function EnrollView() {
-  const {
-    people,
-    enrollments,
-    sessions,
-    handleEnroll,
-    setActiveTab,
-    addToast,
-    prefilledTrainee
-  } = useEnrollment();
-
-  const todayIso = useMemo(() => getTodayIsoDate(), []);
-  const [cohortDate, setCohortDate] = useState(() => getTodayIsoDate());
-
+function EnrollWorkflow({
+  prefilledTrainee,
+  people,
+  enrollments,
+  sessions,
+  cohortDate,
+  todayIso,
+  occupancyMap,
+  handleEnroll,
+  setActiveTab,
+  addToast
+}) {
   const [formValues, setFormValues] = useState(() => ({
     fullName: prefilledTrainee?.fullName || '',
     email: prefilledTrainee?.email || '',
     company: prefilledTrainee?.company || ''
   }));
-
-  // Synchronize form when navigating with a prefilled trainee record
-  const [prevPrefilled, setPrevPrefilled] = useState(prefilledTrainee);
-  if (prefilledTrainee && prefilledTrainee !== prevPrefilled) {
-    setPrevPrefilled(prefilledTrainee);
-    setFormValues({
-      fullName: prefilledTrainee.fullName || '',
-      email: prefilledTrainee.email || '',
-      company: prefilledTrainee.company || ''
-    });
-  }
   const [selectedSessionIds, setSelectedSessionIds] = useState([]);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastEnrollmentSummary, setLastEnrollmentSummary] = useState(null);
-
-  // Compute live occupancy across all sessions for the target cohort date
-  const cohortEnrollments = useMemo(() => {
-    if (!cohortDate || cohortDate === 'ALL') {
-      return enrollments;
-    }
-    // Baseline fixtures date matches unassigned seed records
-    if (cohortDate === '2025-04-28' || cohortDate === '2026-11-10') {
-      return enrollments.filter(
-        e => !e.sessionDate || e.sessionDate === cohortDate || e.sessionDate === '2025-04-28' || e.sessionDate === '2026-11-10'
-      );
-    }
-    return enrollments.filter(e => e.sessionDate === cohortDate);
-  }, [enrollments, cohortDate]);
-
-  const occupancyMap = useMemo(
-    () => getAllSessionsOccupancy(cohortEnrollments, sessions),
-    [cohortEnrollments, sessions]
-  );
 
   // Check if participant email already exists in system
   const normEmail = useMemo(() => normalizeEmail(formValues.email), [formValues.email]);
@@ -206,48 +163,7 @@ export function EnrollView() {
   }, [formValues, selectedSessionIds, cohortDate, handleEnroll, addToast]);
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-extrabold text-[#0F172A] dark:text-white tracking-tight">
-            Enroll People
-          </h1>
-          <p className="text-xs sm:text-sm text-[#64748B] dark:text-slate-400 mt-0.5 font-medium">
-            Register trainees and allocate seats with schedule conflict diagnostics & discount pricing.
-          </p>
-        </div>
-
-        {/* Target Cohort Date with current date as default and interactive picker */}
-        <div className="flex flex-wrap items-center gap-2 text-xs">
-          <label htmlFor="target-cohort-date" className="font-semibold text-slate-500 dark:text-slate-400">
-            Target Cohort Date:
-          </label>
-          <div className="relative inline-flex items-center">
-            <input
-              type="date"
-              id="target-cohort-date"
-              value={cohortDate}
-              onChange={(e) => setCohortDate(e.target.value)}
-              className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#131F37] border border-[#CBD5E1] dark:border-[#1E3150] text-[#0F172A] dark:text-white font-bold text-xs shadow-2xs hover:border-[#009688] dark:hover:border-teal-500 transition-colors focus:outline-none focus:ring-1 focus:ring-[#009688] cursor-pointer"
-            />
-            {cohortDate === todayIso ? (
-              <span className="ml-1.5 text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-300">
-                Today
-              </span>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setCohortDate(todayIso)}
-                className="ml-1.5 text-[11px] font-bold text-[#009688] dark:text-teal-400 hover:underline cursor-pointer"
-              >
-                Reset to Today
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
+    <>
       {/* Success Notification Banner after submission */}
       {lastEnrollmentSummary && (
         <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in fade-in duration-200">
@@ -278,7 +194,7 @@ export function EnrollView() {
             <button
               type="button"
               onClick={() => setLastEnrollmentSummary(null)}
-              className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:text-emerald-800"
+              className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 cursor-pointer"
               aria-label="Dismiss banner"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -329,6 +245,104 @@ export function EnrollView() {
           />
         </div>
       </div>
+    </>
+  );
+}
+
+/**
+ * Screen 2 / 3: Enroll People View
+ * Comprehensive enrollment desk interface with real-time seat availability,
+ * schedule conflict warnings, and automatic discount evaluation.
+ */
+export function EnrollView() {
+  const {
+    people,
+    enrollments,
+    sessions,
+    handleEnroll,
+    setActiveTab,
+    addToast,
+    prefilledTrainee
+  } = useEnrollment();
+
+  const todayIso = useMemo(() => getTodayIsoDate(), []);
+  const [cohortDate, setCohortDate] = useState(() => getTodayIsoDate());
+
+  // Compute live occupancy across all sessions for the target cohort date
+  const cohortEnrollments = useMemo(() => {
+    if (!cohortDate || cohortDate === 'ALL') {
+      return enrollments;
+    }
+    // Baseline fixtures date matches unassigned seed records
+    if (cohortDate === '2025-04-28' || cohortDate === '2026-11-10') {
+      return enrollments.filter(
+        e => !e.sessionDate || e.sessionDate === cohortDate || e.sessionDate === '2025-04-28' || e.sessionDate === '2026-11-10'
+      );
+    }
+    return enrollments.filter(e => e.sessionDate === cohortDate);
+  }, [enrollments, cohortDate]);
+
+  const occupancyMap = useMemo(
+    () => getAllSessionsOccupancy(cohortEnrollments, sessions),
+    [cohortEnrollments, sessions]
+  );
+
+  return (
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold text-[#0F172A] dark:text-white tracking-tight">
+            Enroll People
+          </h1>
+          <p className="text-xs sm:text-sm text-[#64748B] dark:text-slate-400 mt-0.5 font-medium">
+            Register trainees and allocate seats with schedule conflict diagnostics & discount pricing.
+          </p>
+        </div>
+
+        {/* Target Cohort Date with current date as default and interactive picker */}
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <label htmlFor="target-cohort-date" className="font-semibold text-slate-500 dark:text-slate-400">
+            Target Cohort Date:
+          </label>
+          <div className="relative inline-flex items-center">
+            <input
+              type="date"
+              id="target-cohort-date"
+              value={cohortDate}
+              onChange={(e) => setCohortDate(e.target.value)}
+              className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#131F37] border border-[#CBD5E1] dark:border-[#1E3150] text-[#0F172A] dark:text-white font-bold text-xs shadow-2xs hover:border-[#009688] dark:hover:border-teal-500 transition-colors focus:outline-none focus:ring-1 focus:ring-[#009688] cursor-pointer"
+            />
+            {cohortDate === todayIso ? (
+              <span className="ml-1.5 text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-300">
+                Today
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setCohortDate(todayIso)}
+                className="ml-1.5 text-[11px] font-bold text-[#009688] dark:text-teal-400 hover:underline cursor-pointer"
+              >
+                Reset to Today
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <EnrollWorkflow
+        key={prefilledTrainee?.id || prefilledTrainee?.email || 'fresh'}
+        prefilledTrainee={prefilledTrainee}
+        people={people}
+        enrollments={enrollments}
+        sessions={sessions}
+        cohortDate={cohortDate}
+        todayIso={todayIso}
+        occupancyMap={occupancyMap}
+        handleEnroll={handleEnroll}
+        setActiveTab={setActiveTab}
+        addToast={addToast}
+      />
     </div>
   );
 }

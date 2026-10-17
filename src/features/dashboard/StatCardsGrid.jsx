@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useEnrollment } from '../../app/context/EnrollmentContext.jsx';
+import { useEnrollment } from '../../app/context/useEnrollment.js';
 import { TOTAL_DESK_CAPACITY } from '../../domain/sessions/sessionDefinitions.js';
 
 /**

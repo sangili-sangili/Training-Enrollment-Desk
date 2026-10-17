@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { EnrollmentProvider, useEnrollment } from './context/EnrollmentContext.jsx';
+import { EnrollmentProvider } from './context/EnrollmentContext.jsx';
+import { useEnrollment } from './context/useEnrollment.js';
 import { ROUTES } from './routes.js';
 import { Sidebar, Header, MobileNav } from '../components/layout/index.js';
 import { ToastContainer, ProfileModal, ConflictModal, PriceBreakdownModal } from '../components/feedback/index.js';

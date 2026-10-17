@@ -1,14 +1,8 @@
 import { useEffect } from 'react';
-import { useEnrollment } from '../../app/context/EnrollmentContext.jsx';
+import { useEnrollment } from '../../app/context/useEnrollment.js';
 import { Button } from '../ui/Button.jsx';
 
-/**
- * Format currency amount to Indian Rupee (INR)
- */
-function formatCurrency(amount) {
-  if (typeof amount !== 'number' || isNaN(amount)) return '₹0';
-  return `₹${amount.toLocaleString('en-IN')}`;
-}
+import { formatCurrency } from '../../utils/formatters.js';
 
 /**
  * Price Breakdown Modal matching Figma Reference Design

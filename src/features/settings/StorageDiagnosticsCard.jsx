@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useEnrollment } from '../../app/context/EnrollmentContext.jsx';
+import { useEnrollment } from '../../app/context/useEnrollment.js';
 import { STORAGE_KEY } from '../../services/storage/index.js';
 
 /**

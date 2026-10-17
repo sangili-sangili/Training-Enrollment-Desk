@@ -1,27 +1,10 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { useEnrollment } from '../../app/context/EnrollmentContext.jsx';
+import { useEnrollment } from '../../app/context/useEnrollment.js';
 import { StatCardsGrid } from './StatCardsGrid.jsx';
 import { CapacityProgressPanel } from './CapacityProgressPanel.jsx';
 import { UpcomingSessionsList } from './UpcomingSessionsList.jsx';
 
-/**
- * Helper to format date string to "Mon DD, YYYY"
- */
-function formatDateLabel(dateStr) {
-  if (!dateStr || dateStr === 'ALL') return 'All Dates';
-  if (dateStr === '2025-04-28') return 'Apr 28, 2025';
-
-  try {
-    const [year, month, day] = dateStr.split('-');
-    if (year && month && day) {
-      const d = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10));
-      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    }
-    return dateStr;
-  } catch {
-    return dateStr;
-  }
-}
+import { formatDateLabel } from '../../utils/formatters.js';
 
 /**
  * Main Dashboard Screen View matching Figma Design

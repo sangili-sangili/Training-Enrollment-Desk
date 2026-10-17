@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { useEnrollment } from '../../app/context/EnrollmentContext.jsx';
+import { useEnrollment } from '../../app/context/useEnrollment.js';
 import { ROUTES } from '../../app/routes.js';
+import { getInitials } from '../../utils/formatters.js';
 
 const TITLE_MAP = {
   [ROUTES.DASHBOARD]: {
@@ -253,7 +254,7 @@ export function Header({ onToggleMobileMenu }) {
             aria-label="User profile menu"
           >
             <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#009688] to-teal-400 text-white flex items-center justify-center text-xs font-bold shadow-xs group-hover:scale-105 transition-transform ring-2 ring-teal-500/20">
-              AD
+              {getInitials(operator.fullName)}
             </div>
             <div className="hidden sm:flex flex-col text-left">
               <span className="text-xs font-bold text-[#0F172A] dark:text-white leading-tight">

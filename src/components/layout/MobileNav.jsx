@@ -1,5 +1,5 @@
 import { ROUTES } from '../../app/routes.js';
-import { useEnrollment } from '../../app/context/EnrollmentContext.jsx';
+import { useEnrollment } from '../../app/context/useEnrollment.js';
 
 /**
  * Mobile Bottom Tab Navigation

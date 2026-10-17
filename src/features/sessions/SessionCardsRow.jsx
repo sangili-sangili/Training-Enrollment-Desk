@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useEnrollment } from '../../app/context/EnrollmentContext.jsx';
+import { useEnrollment } from '../../app/context/useEnrollment.js';
 
 /**
  * Visual styling theme for the 4 core training sessions
@@ -47,13 +47,7 @@ const SESSION_VISUALS = {
   }
 };
 
-/**
- * Format currency to Indian Rupee (INR)
- */
-function formatCurrency(amount) {
-  if (typeof amount !== 'number' || isNaN(amount)) return '₹0';
-  return `₹${amount.toLocaleString('en-IN')}`;
-}
+import { formatCurrency } from '../../utils/formatters.js';
 
 /**
  * SessionCardsRow component

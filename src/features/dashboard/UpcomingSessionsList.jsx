@@ -1,5 +1,5 @@
 import { useMemo, useCallback } from 'react';
-import { useEnrollment } from '../../app/context/EnrollmentContext.jsx';
+import { useEnrollment } from '../../app/context/useEnrollment.js';
 import { getAllSessionsOccupancy } from '../../domain/enrollment/capacityGuards.js';
 import { Badge } from '../../components/ui/Badge.jsx';
 import { ROUTES } from '../../app/routes.js';
