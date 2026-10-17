@@ -31,17 +31,29 @@ export function EnrollView() {
     sessions,
     handleEnroll,
     setActiveTab,
-    addToast
+    addToast,
+    prefilledTrainee
   } = useEnrollment();
 
   const todayIso = useMemo(() => getTodayIsoDate(), []);
   const [cohortDate, setCohortDate] = useState(() => getTodayIsoDate());
 
-  const [formValues, setFormValues] = useState({
-    fullName: '',
-    email: '',
-    company: ''
-  });
+  const [formValues, setFormValues] = useState(() => ({
+    fullName: prefilledTrainee?.fullName || '',
+    email: prefilledTrainee?.email || '',
+    company: prefilledTrainee?.company || ''
+  }));
+
+  // Synchronize form when navigating with a prefilled trainee record
+  const [prevPrefilled, setPrevPrefilled] = useState(prefilledTrainee);
+  if (prefilledTrainee && prefilledTrainee !== prevPrefilled) {
+    setPrevPrefilled(prefilledTrainee);
+    setFormValues({
+      fullName: prefilledTrainee.fullName || '',
+      email: prefilledTrainee.email || '',
+      company: prefilledTrainee.company || ''
+    });
+  }
   const [selectedSessionIds, setSelectedSessionIds] = useState([]);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);

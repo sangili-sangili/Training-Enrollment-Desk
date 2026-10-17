@@ -6,25 +6,10 @@ import { ToastContainer, ProfileModal, ConflictModal, PriceBreakdownModal } from
 import { DashboardView } from '../features/dashboard/index.js';
 import { EnrollView } from '../features/enrollment/index.js';
 import { SessionsView } from '../features/sessions/index.js';
+import { PeopleView } from '../features/people/index.js';
 import { LoginView } from '../features/authentication/index.js';
 
-function ViewShellPlaceholder({ title, description, badgeText }) {
-  return (
-    <div className="bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-2xl p-8 shadow-xs">
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-xl font-bold text-[#0F172A] dark:text-white">{title}</h2>
-        {badgeText && (
-          <span className="text-xs font-semibold px-2.5 py-1 bg-teal-50 dark:bg-teal-950/60 text-[#009688] dark:text-teal-400 rounded-full border border-teal-200 dark:border-teal-800">
-            {badgeText}
-          </span>
-        )}
-      </div>
-      <p className="text-sm text-[#64748B] dark:text-slate-400 max-w-2xl leading-relaxed">
-        {description}
-      </p>
-    </div>
-  );
-}
+
 
 function MainContent() {
   const { activeTab, handleResetData, isAuthenticated, theme } = useEnrollment();
@@ -84,13 +69,7 @@ function MainContent() {
 
             {activeTab === ROUTES.SESSIONS && <SessionsView />}
 
-            {activeTab === ROUTES.PEOPLE && (
-              <ViewShellPlaceholder
-                title="Trainee Directory"
-                description="Unique participant records, total investment, and session history."
-                badgeText="Screen 5"
-              />
-            )}
+            {activeTab === ROUTES.PEOPLE && <PeopleView />}
 
             {activeTab === ROUTES.SETTINGS && (
               <div className="bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-2xl p-8 shadow-xs space-y-4">

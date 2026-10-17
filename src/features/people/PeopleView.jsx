@@ -1,0 +1,259 @@
+import { useState, useMemo, useCallback } from 'react';
+import { useEnrollment } from '../../app/context/EnrollmentContext.jsx';
+import { ROUTES } from '../../app/routes.js';
+import { calculatePriceBreakdown } from '../../domain/pricing/priceBreakdown.js';
+import { PeopleSummaryCards } from './PeopleSummaryCards.jsx';
+import { PeopleFilterToolbar } from './PeopleFilterToolbar.jsx';
+import { PeopleTable } from './PeopleTable.jsx';
+import { PeopleCardGrid } from './PeopleCardGrid.jsx';
+import { TraineeDetailsModal } from './TraineeDetailsModal.jsx';
+import { CancelEnrollmentModal } from '../sessions/CancelEnrollmentModal.jsx';
+
+/**
+ * Screen 5: Trainee Directory / People Registry View
+ * Displays searchable list of unique participants, lifetime investment,
+ * and comprehensive individual enrollment history.
+ */
+export function PeopleView() {
+  const {
+    people,
+    enrollments,
+    sessions,
+    trainingDate,
+    setActiveTab,
+    setPrefilledTrainee,
+    setPriceModalData,
+    handleCancelEnrollment
+  } = useEnrollment();
+
+  // Local filter states
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCompany, setSelectedCompany] = useState('ALL');
+  const [selectedStatus, setSelectedStatus] = useState('ALL');
+  const [viewMode, setViewMode] = useState('table'); // 'table' | 'grid'
+
+  // Modals state
+  const [selectedPerson, setSelectedPerson] = useState(null);
+  const [cancelModalState, setCancelModalState] = useState(null);
+
+  // Precompute session map for O(1) lookups
+  const sessionsMap = useMemo(() => {
+    const map = new Map();
+    for (let i = 0; i < sessions.length; i++) {
+      map.set(sessions[i].id, sessions[i]);
+    }
+    return map;
+  }, [sessions]);
+
+  // Derived sorted list of unique companies
+  const uniqueCompanies = useMemo(() => {
+    const set = new Set();
+    for (let i = 0; i < people.length; i++) {
+      const company = (people[i].company || '').trim();
+      if (company) set.add(company);
+    }
+    return Array.from(set).sort();
+  }, [people]);
+
+  // Precompute participant enrollment map
+  const personEnrollmentsMap = useMemo(() => {
+    const map = new Map();
+    for (let i = 0; i < enrollments.length; i++) {
+      const enr = enrollments[i];
+      if (!map.has(enr.personId)) {
+        map.set(enr.personId, []);
+      }
+      map.get(enr.personId).push(enr);
+    }
+    return map;
+  }, [enrollments]);
+
+  // Filtered people list
+  const filteredPeople = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+
+    return people.filter(person => {
+      // 1. Company filter
+      if (selectedCompany !== 'ALL') {
+        const company = (person.company || '').trim();
+        if (company.toLowerCase() !== selectedCompany.toLowerCase()) {
+          return false;
+        }
+      }
+
+      // 2. Status filter
+      if (selectedStatus !== 'ALL') {
+        const personEnrs = personEnrollmentsMap.get(person.id) || [];
+        if (selectedStatus === 'CONFIRMED' && !personEnrs.some(e => e.status === 'Confirmed')) {
+          return false;
+        }
+        if (selectedStatus === 'WAITLISTED' && !personEnrs.some(e => e.status === 'Waitlisted')) {
+          return false;
+        }
+        if (selectedStatus === 'MULTI' && personEnrs.length < 2) {
+          return false;
+        }
+      }
+
+      // 3. Search query
+      if (query) {
+        const nameMatch = person.fullName?.toLowerCase().includes(query);
+        const emailMatch = person.email?.toLowerCase().includes(query);
+        const companyMatch = person.company?.toLowerCase().includes(query);
+
+        if (!nameMatch && !emailMatch && !companyMatch) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [people, searchQuery, selectedCompany, selectedStatus, personEnrollmentsMap]);
+
+  // Action handlers
+  const handleResetFilters = useCallback(() => {
+    setSearchQuery('');
+    setSelectedCompany('ALL');
+    setSelectedStatus('ALL');
+  }, []);
+
+  const handleEnrollNewSession = useCallback((person) => {
+    setSelectedPerson(null);
+    setPrefilledTrainee(person);
+    setActiveTab(ROUTES.ENROLL);
+  }, [setActiveTab, setPrefilledTrainee]);
+
+  const handleViewPriceBreakdown = useCallback((enrollment, person, session) => {
+    const breakdown = calculatePriceBreakdown({
+      sessionId: enrollment.sessionId,
+      referenceDate: enrollment.enrolledAt,
+      sessionDate: enrollment.sessionDate || trainingDate || '2025-04-28',
+      company: person?.company || '',
+      status: enrollment.status,
+      enrollments,
+      people
+    });
+
+    setPriceModalData({
+      enrollment,
+      person,
+      session,
+      breakdown
+    });
+  }, [enrollments, people, trainingDate, setPriceModalData]);
+
+  const handleOpenCancelModal = useCallback((enrollment, person, session) => {
+    const hasWaitlist = enrollments.some(
+      e => e.sessionId === enrollment.sessionId && e.status === 'Waitlisted'
+    );
+
+    setCancelModalState({
+      enrollment,
+      person,
+      session,
+      hasWaitlist
+    });
+  }, [enrollments]);
+
+  const handleConfirmCancel = useCallback(() => {
+    if (cancelModalState?.enrollment) {
+      handleCancelEnrollment(cancelModalState.enrollment.id);
+      setCancelModalState(null);
+    }
+  }, [cancelModalState, handleCancelEnrollment]);
+
+  return (
+    <div className="space-y-6">
+      {/* Header Row */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold text-[#0F172A] dark:text-white tracking-tight">
+            Trainee Directory
+          </h1>
+          <p className="text-xs sm:text-sm text-[#64748B] dark:text-slate-400 mt-0.5 font-medium">
+            Registered participants, company affiliations, and lifetime course history
+          </p>
+        </div>
+
+        {/* CTA: New Enrollment */}
+        <button
+          type="button"
+          onClick={() => setActiveTab(ROUTES.ENROLL)}
+          className="flex items-center space-x-2 px-4 py-2 bg-[#009688] hover:bg-[#00897B] text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm hover:shadow transition-all cursor-pointer self-start sm:self-auto"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>+ Enroll Participant</span>
+        </button>
+      </div>
+
+      {/* Top 4 Summary Cards */}
+      <PeopleSummaryCards
+        people={people}
+        enrollments={enrollments}
+      />
+
+      {/* Multi-criteria Filter Toolbar with Table / Grid View Switcher */}
+      <PeopleFilterToolbar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        selectedCompany={selectedCompany}
+        onCompanyChange={setSelectedCompany}
+        selectedStatus={selectedStatus}
+        onStatusChange={setSelectedStatus}
+        uniqueCompanies={uniqueCompanies}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        totalCount={filteredPeople.length}
+        onResetFilters={handleResetFilters}
+      />
+
+      {/* Trainees List: Table or Cards Grid */}
+      {viewMode === 'table' ? (
+        <PeopleTable
+          people={filteredPeople}
+          enrollments={enrollments}
+          sessionsMap={sessionsMap}
+          onSelectPerson={setSelectedPerson}
+          onEnrollNewSession={handleEnrollNewSession}
+        />
+      ) : (
+        <PeopleCardGrid
+          people={filteredPeople}
+          enrollments={enrollments}
+          sessionsMap={sessionsMap}
+          onSelectPerson={setSelectedPerson}
+          onEnrollNewSession={handleEnrollNewSession}
+        />
+      )}
+
+      {/* Trainee Details Slide-over / Modal */}
+      {selectedPerson && (
+        <TraineeDetailsModal
+          person={selectedPerson}
+          enrollments={enrollments}
+          sessionsMap={sessionsMap}
+          onClose={() => setSelectedPerson(null)}
+          onEnrollNewSession={handleEnrollNewSession}
+          onViewPriceBreakdown={handleViewPriceBreakdown}
+          onCancelEnrollment={handleOpenCancelModal}
+        />
+      )}
+
+      {/* Cancel Seat Confirmation Modal */}
+      {cancelModalState && (
+        <CancelEnrollmentModal
+          enrollment={cancelModalState.enrollment}
+          person={cancelModalState.person}
+          session={cancelModalState.session}
+          hasWaitlist={cancelModalState.hasWaitlist}
+          onConfirm={handleConfirmCancel}
+          onCancel={() => setCancelModalState(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+export default PeopleView;

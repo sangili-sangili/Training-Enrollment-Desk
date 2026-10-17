@@ -214,6 +214,7 @@ export function EnrollmentProvider({ children }) {
   // Modals state
   const [conflictModalData, setConflictModalData] = useState(null);
   const [priceModalData, setPriceModalData] = useState(null);
+  const [prefilledTrainee, setPrefilledTrainee] = useState(null);
 
   // Toast notifications queue
   const [toasts, setToasts] = useState([]);
@@ -444,7 +445,9 @@ export function EnrollmentProvider({ children }) {
     conflictModalData,
     setConflictModalData,
     priceModalData,
-    setPriceModalData
+    setPriceModalData,
+    prefilledTrainee,
+    setPrefilledTrainee
   }), [
     theme,
     toggleTheme,
@@ -480,7 +483,9 @@ export function EnrollmentProvider({ children }) {
     conflictModalData,
     setConflictModalData,
     priceModalData,
-    setPriceModalData
+    setPriceModalData,
+    prefilledTrainee,
+    setPrefilledTrainee
   ]);
 
   return (
