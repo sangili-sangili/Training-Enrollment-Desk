@@ -206,9 +206,9 @@ function EnrollWorkflow({
       )}
 
       {/* Main Two-Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
         {/* Left Column (2 Cols): Trainee Details & Sessions Checklist */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="xl:col-span-2 space-y-6">
           <TraineeForm
             values={formValues}
             onChange={handleFieldChange}
@@ -227,7 +227,7 @@ function EnrollWorkflow({
         </div>
 
         {/* Right Column (1 Col): Live Pricing & Confirmation Card */}
-        <div className="lg:col-span-1">
+        <div className="xl:col-span-1">
           <SelectedSummaryCard
             selectedSessionIds={selectedSessionIds}
             sessions={sessions}

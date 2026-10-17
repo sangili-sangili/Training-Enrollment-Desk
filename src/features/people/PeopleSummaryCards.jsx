@@ -130,34 +130,30 @@ export function PeopleSummaryCards({
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5">
       {cards.map((card) => (
         <div
           key={card.id}
-          className={`${card.cardBg} border ${card.cardBorder} rounded-2xl p-5 shadow-xs hover-lift transition-all relative overflow-hidden group`}
+          className={`${card.cardBg} border ${card.cardBorder} rounded-2xl p-4 sm:p-5 shadow-xs hover-lift transition-all relative overflow-hidden group`}
         >
-          {/* Decorative Multiple Color Background Circles */}
+          {/* Decorative Subtle Background Circles */}
           <div
-            className={`absolute -top-12 -right-12 w-40 h-40 rounded-full bg-gradient-to-br ${card.bgCircleGradient} pointer-events-none transition-transform duration-700 ease-out group-hover:scale-110`}
+            className={`absolute -top-12 -right-12 w-36 h-36 rounded-full bg-gradient-to-br ${card.bgCircleGradient} pointer-events-none transition-transform duration-700 ease-out group-hover:scale-105 opacity-70`}
             aria-hidden="true"
           />
           <div
-            className={`absolute -top-4 -right-4 w-28 h-28 rounded-full border ${card.bgRingColor} pointer-events-none transition-transform duration-500 ease-out group-hover:scale-105`}
+            className={`absolute -top-4 -right-4 w-24 h-24 rounded-full border ${card.bgRingColor} pointer-events-none transition-transform duration-500 ease-out group-hover:scale-105 opacity-60`}
             aria-hidden="true"
           />
           <div
-            className={`absolute top-4 right-20 w-16 h-16 rounded-full ${card.bgGlowColor} blur-md pointer-events-none transition-transform duration-700 ease-out group-hover:scale-125`}
-            aria-hidden="true"
-          />
-          <div
-            className={`absolute top-12 right-24 w-3.5 h-3.5 rounded-full ${card.bgDotColor} pointer-events-none`}
+            className={`absolute top-4 right-16 w-14 h-14 rounded-full ${card.bgGlowColor} blur-md pointer-events-none opacity-50`}
             aria-hidden="true"
           />
 
-          <div className="relative z-10 flex items-start space-x-4">
+          <div className="relative z-10 flex items-start space-x-3.5 sm:space-x-4">
             {/* Left solid color circle badge */}
             <div
-              className={`w-12 h-12 rounded-2xl ${card.circleBg} flex items-center justify-center shrink-0 shadow-sm shadow-slate-200 dark:shadow-none transition-transform duration-300 group-hover:scale-105`}
+              className={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl ${card.circleBg} flex items-center justify-center shrink-0 shadow-sm shadow-slate-200 dark:shadow-none transition-transform duration-300 group-hover:scale-105`}
             >
               {card.icon}
             </div>
@@ -168,11 +164,11 @@ export function PeopleSummaryCards({
                 <span className="text-xs font-semibold text-[#64748B] dark:text-slate-400 truncate">
                   {card.label}
                 </span>
-                <span className="text-[11px] font-bold text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/60 px-2 py-0.5 rounded-full shrink-0 border border-teal-200/50 dark:border-teal-800/40">
+                <span className="text-[11px] font-bold text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/60 px-1.5 sm:px-2 py-0.5 rounded-full shrink-0 border border-teal-200/50 dark:border-teal-800/40 whitespace-nowrap">
                   {card.badge}
                 </span>
               </div>
-              <div className="text-2xl font-extrabold text-[#0F172A] dark:text-white mt-1 tracking-tight">
+              <div className="text-xl sm:text-2xl font-extrabold text-[#0F172A] dark:text-white mt-1 tracking-tight">
                 {card.value}
               </div>
               <div className="text-xs text-[#64748B] dark:text-slate-400 mt-0.5 truncate">

@@ -177,9 +177,10 @@ export function SessionsView() {
   return (
     <div className="space-y-6">
       {/* Header Row matching Figma reference */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-extrabold text-[#0F172A] dark:text-white tracking-tight">
+      {/* Header Row matching Figma reference */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-[#0F172A] dark:text-white tracking-tight">
             Session Management
           </h1>
           <p className="text-xs sm:text-sm text-[#64748B] dark:text-slate-400 mt-0.5 font-medium">
@@ -187,8 +188,8 @@ export function SessionsView() {
           </p>
         </div>
 
-        {/* Right side controls: Cohort Date selector & + New Enrollment CTA */}
-        <div className="flex flex-wrap items-center gap-3 self-start sm:self-auto">
+        {/* Right side controls: Cohort Date selector & New Enrollment CTA */}
+        <div className="flex items-center gap-2.5 sm:gap-3 shrink-0 self-start sm:self-auto">
           {/* Cohort Date Filter */}
           <div className="relative" ref={dropdownRef}>
             <button
@@ -213,7 +214,7 @@ export function SessionsView() {
             </button>
 
             {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#131F37] border border-[#E2E8F0] dark:border-[#1E3150] rounded-2xl shadow-xl py-2 z-30 animate-in fade-in zoom-in-95 duration-100">
+              <div className="absolute right-0 mt-2 w-64 max-w-[calc(100vw-2rem)] bg-white dark:bg-[#131F37] border border-[#E2E8F0] dark:border-[#1E3150] rounded-2xl shadow-xl py-2 z-30 animate-in fade-in zoom-in-95 duration-100">
                 <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                   Select Cohort Filter
                 </div>
@@ -272,12 +273,12 @@ export function SessionsView() {
           <button
             type="button"
             onClick={() => setActiveTab(ROUTES.ENROLL)}
-            className="flex items-center space-x-2 px-4 py-2 bg-[#009688] hover:bg-[#00897B] text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm hover:shadow transition-all cursor-pointer"
+            className="flex items-center space-x-2 px-3.5 sm:px-4 py-2 bg-[#009688] hover:bg-[#00897B] text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm hover:shadow transition-all cursor-pointer whitespace-nowrap"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
             </svg>
-            <span>+ New Enrollment</span>
+            <span>New Enrollment</span>
           </button>
         </div>
       </div>

@@ -69,42 +69,38 @@ export function UpcomingSessionsList() {
   }, [setSelectedSessionFilter, setActiveTab]);
 
   return (
-    <div className="bg-white dark:bg-[#131F37] border border-[#E2E8F0] dark:border-[#1E3150] rounded-2xl p-6 shadow-xs flex flex-col justify-between hover-lift transition-all relative overflow-hidden group">
-      {/* Decorative Multiple Color Background Circles */}
+    <div className="bg-white dark:bg-[#131F37] border border-[#E2E8F0] dark:border-[#1E3150] rounded-2xl p-4 sm:p-6 shadow-xs flex flex-col justify-between hover-lift transition-all relative overflow-hidden group">
+      {/* Decorative Subtle Background Circles */}
       <div
-        className="absolute -top-12 -right-12 w-44 h-44 rounded-full bg-gradient-to-br from-[#3B82F6]/10 via-purple-400/5 to-transparent pointer-events-none transition-transform duration-700 ease-out group-hover:scale-110"
+        className="absolute -top-12 -right-12 w-40 h-40 rounded-full bg-gradient-to-br from-[#3B82F6]/10 via-purple-400/5 to-transparent pointer-events-none transition-transform duration-700 ease-out group-hover:scale-105 opacity-70"
         aria-hidden="true"
       />
       <div
-        className="absolute -top-6 -right-6 w-32 h-32 rounded-full border border-blue-500/15 dark:border-blue-400/20 pointer-events-none transition-transform duration-500 ease-out group-hover:scale-105"
-        aria-hidden="true"
-      />
-      <div
-        className="absolute top-10 right-28 w-6 h-6 rounded-full bg-blue-400/25 pointer-events-none"
+        className="absolute -top-6 -right-6 w-28 h-28 rounded-full border border-blue-500/15 dark:border-blue-400/20 pointer-events-none transition-transform duration-500 ease-out group-hover:scale-105 opacity-60"
         aria-hidden="true"
       />
 
       <div className="relative z-10">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
           <div>
-            <h2 className="text-base font-extrabold text-[#0F172A] dark:text-white">
+            <h2 className="text-sm sm:text-base font-extrabold text-[#0F172A] dark:text-white">
               Upcoming Sessions
             </h2>
-            <p className="text-xs text-[#64748B] dark:text-slate-400 mt-0.5">
+            <p className="text-[11px] sm:text-xs text-[#64748B] dark:text-slate-400 mt-0.5">
               Active timetable and live cohort statuses
             </p>
           </div>
           <button
             type="button"
             onClick={() => setActiveTab(ROUTES.SESSIONS)}
-            className="text-xs font-bold text-[#009688] dark:text-teal-400 hover:text-[#007F76] transition-colors inline-flex items-center group"
+            className="text-xs font-bold text-[#009688] dark:text-teal-400 hover:text-[#007F76] transition-colors inline-flex items-center group shrink-0 ml-2"
           >
             <span>View all</span>
             <span className="group-hover:translate-x-1 transition-transform ml-1">&rarr;</span>
           </button>
         </div>
 
-        <div className="space-y-3.5">
+        <div className="space-y-3 sm:space-y-3.5">
           {sessions.map((session) => {
             const occupancy = occupancyMap[session.id] || {
               occupiedSeats: 0,
@@ -121,31 +117,33 @@ export function UpcomingSessionsList() {
               <div
                 key={session.id}
                 onClick={() => handleInspectSession(session.id)}
-                className="group p-3.5 rounded-xl border border-[#E2E8F0] dark:border-[#1E3150] hover:border-[#009688] dark:hover:border-teal-500 hover:bg-teal-50/20 dark:hover:bg-teal-950/30 transition-all cursor-pointer flex items-center justify-between"
+                className="group p-3 sm:p-3.5 rounded-xl border border-[#E2E8F0] dark:border-[#1E3150] hover:border-[#009688] dark:hover:border-teal-500 hover:bg-teal-50/20 dark:hover:bg-teal-950/30 transition-all cursor-pointer flex items-center justify-between gap-2.5 sm:gap-4"
               >
-                <div className="flex items-center space-x-3.5">
-                  {icon}
-                  <div>
-                    <div className="text-sm font-bold text-[#0F172A] dark:text-white group-hover:text-[#009688] dark:group-hover:text-teal-400 transition-colors">
+                <div className="flex items-center space-x-3 sm:space-x-3.5 min-w-0 flex-1">
+                  <div className="shrink-0">
+                    {icon}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-xs sm:text-sm font-bold text-[#0F172A] dark:text-white group-hover:text-[#009688] dark:group-hover:text-teal-400 transition-colors truncate">
                       {session.title}
                     </div>
-                    <div className="text-xs text-[#64748B] dark:text-slate-400 flex items-center space-x-2 mt-0.5">
-                      <span>{session.startTime} - {session.endTime}</span>
-                      <span>&bull;</span>
-                      <span className="font-semibold text-slate-700 dark:text-slate-300">{session.room}</span>
+                    <div className="text-[11px] sm:text-xs text-[#64748B] dark:text-slate-400 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 mt-0.5 leading-tight">
+                      <span className="whitespace-nowrap font-medium">{session.startTime} - {session.endTime}</span>
+                      <span className="text-slate-300 dark:text-slate-600 hidden xs:inline">&bull;</span>
+                      <span className="font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">{session.room}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-3">
-                  <Badge variant={status}>
+                <div className="flex flex-col sm:flex-row items-end sm:items-center gap-1 sm:gap-3 shrink-0">
+                  <Badge variant={status} size="sm">
                     {status}
                   </Badge>
-                  <div className="text-right min-w-14">
+                  <div className="text-right sm:min-w-12">
                     <span className="text-xs font-extrabold text-[#0F172A] dark:text-white">
                       {displayedOccupied}/{session.capacity}
                     </span>
-                    <span className="block text-[10px] text-slate-400 font-medium">
+                    <span className="text-[10px] text-slate-400 font-medium ml-1 sm:block sm:ml-0">
                       seats
                     </span>
                   </div>

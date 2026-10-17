@@ -43,11 +43,11 @@ export function PriceBreakdownModal() {
       aria-modal="true"
       aria-labelledby="price-breakdown-title"
     >
-      <div className="w-full max-w-md bg-white dark:bg-[#131F37] border border-[#E2E8F0] dark:border-[#1E3150] rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150">
+      <div className="w-full max-w-md bg-white dark:bg-[#131F37] border border-[#E2E8F0] dark:border-[#1E3150] rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150 max-h-[90vh] flex flex-col">
         {/* Modal Header */}
-        <div className="px-6 py-5 border-b border-[#E2E8F0] dark:border-[#1E3150] flex items-center justify-between bg-slate-50/60 dark:bg-[#182744]">
+        <div className="px-5 sm:px-6 py-4 sm:py-5 border-b border-[#E2E8F0] dark:border-[#1E3150] flex items-center justify-between bg-slate-50/60 dark:bg-[#182744] shrink-0">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-[#009688] dark:text-teal-400 flex items-center justify-center font-bold">
+            <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-[#009688] dark:text-teal-400 flex items-center justify-center font-bold shrink-0">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
               </svg>
@@ -75,7 +75,7 @@ export function PriceBreakdownModal() {
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 space-y-5">
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-5 overflow-y-auto">
           {/* Participant & Session Details */}
           <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#1A2949] border border-slate-200/80 dark:border-[#22385F] space-y-1.5">
             <div className="flex items-center justify-between text-xs">

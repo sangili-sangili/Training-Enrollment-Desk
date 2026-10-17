@@ -64,42 +64,38 @@ export function CapacityProgressPanel() {
   );
 
   return (
-    <div className="bg-white dark:bg-[#131F37] border border-[#E2E8F0] dark:border-[#1E3150] rounded-2xl p-6 shadow-xs flex flex-col justify-between hover-lift transition-all relative overflow-hidden group">
-      {/* Decorative Multiple Color Background Circles */}
+    <div className="bg-white dark:bg-[#131F37] border border-[#E2E8F0] dark:border-[#1E3150] rounded-2xl p-4 sm:p-6 shadow-xs flex flex-col justify-between hover-lift transition-all relative overflow-hidden group">
+      {/* Decorative Subtle Background Circles */}
       <div
-        className="absolute -top-12 -right-12 w-44 h-44 rounded-full bg-gradient-to-br from-[#009688]/10 via-teal-400/5 to-transparent pointer-events-none transition-transform duration-700 ease-out group-hover:scale-110"
+        className="absolute -top-12 -right-12 w-40 h-40 rounded-full bg-gradient-to-br from-[#009688]/10 via-teal-400/5 to-transparent pointer-events-none transition-transform duration-700 ease-out group-hover:scale-105 opacity-70"
         aria-hidden="true"
       />
       <div
-        className="absolute -top-6 -right-6 w-32 h-32 rounded-full border border-teal-500/15 dark:border-teal-400/20 pointer-events-none transition-transform duration-500 ease-out group-hover:scale-105"
-        aria-hidden="true"
-      />
-      <div
-        className="absolute top-10 right-28 w-6 h-6 rounded-full bg-teal-400/25 pointer-events-none"
+        className="absolute -top-6 -right-6 w-28 h-28 rounded-full border border-teal-500/15 dark:border-teal-400/20 pointer-events-none transition-transform duration-500 ease-out group-hover:scale-105 opacity-60"
         aria-hidden="true"
       />
 
       <div className="relative z-10">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
           <div>
-            <h2 className="text-base font-extrabold text-[#0F172A] dark:text-white">
+            <h2 className="text-sm sm:text-base font-extrabold text-[#0F172A] dark:text-white">
               Session Capacity & Occupancy
             </h2>
-            <p className="text-xs text-[#64748B] dark:text-slate-400 mt-0.5">
+            <p className="text-[11px] sm:text-xs text-[#64748B] dark:text-slate-400 mt-0.5">
               Real-time seat reservations and availability
             </p>
           </div>
           <button
             type="button"
             onClick={() => setActiveTab(ROUTES.SESSIONS)}
-            className="text-xs font-bold text-[#009688] dark:text-teal-400 hover:text-[#007F76] transition-colors inline-flex items-center group"
+            className="text-xs font-bold text-[#009688] dark:text-teal-400 hover:text-[#007F76] transition-colors inline-flex items-center group shrink-0 ml-2"
           >
             <span>View all</span>
             <span className="group-hover:translate-x-1 transition-transform ml-1">&rarr;</span>
           </button>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {sessions.map((session) => {
             const occupancy = occupancyMap[session.id] || {
               occupiedSeats: 0,
@@ -118,24 +114,28 @@ export function CapacityProgressPanel() {
 
             return (
               <div key={session.id} className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3.5">
-                    {style.icon}
-                    <div>
-                      <div className="text-sm font-bold text-[#0F172A] dark:text-white">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center space-x-3 sm:space-x-3.5 min-w-0 flex-1">
+                    <div className="shrink-0">
+                      {style.icon}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-xs sm:text-sm font-bold text-[#0F172A] dark:text-white truncate">
                         {session.title}
                       </div>
-                      <div className="text-xs text-[#64748B] dark:text-slate-400 mt-0.5">
-                        {session.startTime} - {session.endTime} &bull; {session.room}
+                      <div className="text-[11px] sm:text-xs text-[#64748B] dark:text-slate-400 flex flex-wrap items-center gap-x-1.5 mt-0.5 leading-tight">
+                        <span className="whitespace-nowrap font-medium">{session.startTime} - {session.endTime}</span>
+                        <span className="text-slate-300 dark:text-slate-600 hidden xs:inline">&bull;</span>
+                        <span className="whitespace-nowrap font-medium text-slate-700 dark:text-slate-300">{session.room}</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="text-right">
-                    <span className="text-sm font-extrabold text-[#0F172A] dark:text-white">
+                  <div className="text-right shrink-0">
+                    <span className="text-xs sm:text-sm font-extrabold text-[#0F172A] dark:text-white whitespace-nowrap">
                       {displayedOccupied} / {session.capacity}
                     </span>
-                    <span className="text-xs text-[#94A3B8] dark:text-slate-400 ml-1.5 font-medium">
+                    <span className="text-[10px] sm:text-xs text-[#94A3B8] dark:text-slate-400 ml-1 sm:ml-1.5 font-medium whitespace-nowrap block xs:inline">
                       ({displayedAvailable} left)
                     </span>
                   </div>

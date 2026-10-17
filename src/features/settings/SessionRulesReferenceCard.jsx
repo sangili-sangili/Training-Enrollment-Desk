@@ -19,8 +19,8 @@ export function SessionRulesReferenceCard() {
       </div>
 
       {/* Catalog Table */}
-      <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
-        <table className="w-full text-left text-xs border-collapse">
+      <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 scrollbar-thin">
+        <table className="w-full min-w-[640px] text-left text-xs border-collapse">
           <thead>
             <tr className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">
               <th className="py-3 px-4">Session Code & Title</th>
@@ -86,7 +86,7 @@ export function SessionRulesReferenceCard() {
       </div>
 
       {/* Pricing Policy Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-2">
         <div className="p-4 rounded-xl bg-teal-50/50 dark:bg-teal-950/20 border border-teal-200/80 dark:border-teal-800/60">
           <div className="flex items-center gap-2 text-teal-800 dark:text-teal-300 font-bold text-xs uppercase tracking-wide">
             <span className="w-2 h-2 rounded-full bg-teal-500" />

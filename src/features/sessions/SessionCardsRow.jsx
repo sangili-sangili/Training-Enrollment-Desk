@@ -81,7 +81,7 @@ export function SessionCardsRow() {
   }, [sessions, activeEnrollments]);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-4 gap-4">
       {sessions.map(session => {
         const stats = statsMap[session.id] || { confirmed: 0, offered: 0, waitlisted: 0 };
         const occupied = stats.confirmed + stats.offered;
@@ -101,7 +101,7 @@ export function SessionCardsRow() {
                 setSelectedSessionFilter(isSelected ? 'ALL' : session.id);
               }
             }}
-            className={`group relative overflow-hidden bg-white dark:bg-[#131F37] border rounded-2xl p-5 shadow-xs transition-all duration-200 cursor-pointer ${
+            className={`group relative overflow-hidden bg-white dark:bg-[#131F37] border rounded-2xl p-4 sm:p-5 shadow-xs transition-all duration-200 cursor-pointer ${
               isSelected
                 ? 'border-[#009688] ring-2 ring-[#009688] shadow-md dark:border-teal-500'
                 : 'border-[#E2E8F0] dark:border-[#1E3150] hover:border-teal-400 dark:hover:border-teal-600 hover:shadow-md'
@@ -109,15 +109,15 @@ export function SessionCardsRow() {
           >
             {/* Top row: Icon and pricing */}
             <div className="flex items-start justify-between">
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-3 min-w-0 flex-1">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-xs shrink-0 ${visual.bgGradient}`}>
                   {visual.icon}
                 </div>
-                <div>
-                  <h3 className="text-sm font-bold text-[#0F172A] dark:text-white group-hover:text-[#009688] dark:group-hover:text-teal-400 transition-colors">
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-sm font-bold text-[#0F172A] dark:text-white group-hover:text-[#009688] dark:group-hover:text-teal-400 transition-colors truncate">
                     {session.title}
                   </h3>
-                  <p className="text-xs text-[#64748B] dark:text-slate-400 font-medium">
+                  <p className="text-xs text-[#64748B] dark:text-slate-400 font-medium truncate">
                     {session.startTime} – {session.endTime} • {session.room}
                   </p>
                 </div>
@@ -153,21 +153,21 @@ export function SessionCardsRow() {
             </div>
 
             {/* Bottom summary counts and filter indicator */}
-            <div className="mt-3.5 flex items-center justify-between text-xs font-semibold pt-2.5 border-t border-slate-100 dark:border-[#1E3150]">
-              <div className="flex items-center space-x-2 text-[#475569] dark:text-slate-300">
-                <span className="flex items-center space-x-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <div className="mt-3.5 flex items-center justify-between text-xs font-semibold pt-2.5 border-t border-slate-100 dark:border-[#1E3150] gap-2">
+              <div className="flex items-center gap-2 text-[#475569] dark:text-slate-300 min-w-0 flex-wrap">
+                <span className="flex items-center space-x-1 whitespace-nowrap">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                   <span>{stats.confirmed} Confirmed</span>
                 </span>
                 {stats.waitlisted > 0 && (
-                  <span className="flex items-center space-x-1 text-amber-600 dark:text-amber-400">
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                  <span className="flex items-center space-x-1 text-amber-600 dark:text-amber-400 whitespace-nowrap">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
                     <span>{stats.waitlisted} Waitlist</span>
                   </span>
                 )}
               </div>
 
-              <span className={`text-[11px] font-bold transition-colors ${
+              <span className={`text-[11px] font-bold transition-colors whitespace-nowrap shrink-0 ${
                 isSelected
                   ? 'text-teal-600 dark:text-teal-400'
                   : 'text-slate-400 group-hover:text-teal-600 dark:group-hover:text-teal-400'

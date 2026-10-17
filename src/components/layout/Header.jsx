@@ -101,11 +101,11 @@ export function Header({ onToggleMobileMenu }) {
   return (
     <header className="h-18 bg-white dark:bg-[#131F37] border-b border-[#E2E8F0] dark:border-[#1E3150] px-4 md:px-8 flex items-center justify-between shrink-0 transition-colors">
       {/* Left: Mobile Toggle & Page Title */}
-      <div className="flex items-center space-x-3.5">
+      <div className="flex items-center space-x-2.5 sm:space-x-3.5 min-w-0 flex-1 mr-2 sm:mr-4">
         <button
           type="button"
           onClick={onToggleMobileMenu}
-          className="md:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none"
+          className="md:hidden p-1.5 sm:p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none shrink-0"
           aria-label="Toggle menu"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -114,17 +114,17 @@ export function Header({ onToggleMobileMenu }) {
         </button>
 
         {activeTab === ROUTES.DASHBOARD ? (
-          <div className="hidden sm:flex items-center space-x-2 text-xs font-semibold text-[#64748B] dark:text-slate-400">
-            <span className="text-[#009688] dark:text-teal-400 font-bold">Training Desk</span>
-            <span>/</span>
-            <span>Workspace Overview</span>
+          <div className="flex items-center space-x-1.5 sm:space-x-2 text-xs font-semibold text-[#64748B] dark:text-slate-400 truncate">
+            <span className="text-[#009688] dark:text-teal-400 font-bold whitespace-nowrap">Training Desk</span>
+            <span className="hidden sm:inline">/</span>
+            <span className="hidden sm:inline truncate">Workspace Overview</span>
           </div>
         ) : (
-          <div>
-            <h1 className="text-xl font-extrabold text-[#0F172A] dark:text-white leading-tight tracking-tight">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-sm sm:text-lg md:text-xl font-extrabold text-[#0F172A] dark:text-white leading-tight tracking-tight truncate">
               {currentHeader.title}
             </h1>
-            <p className="text-xs text-[#64748B] dark:text-slate-400 font-medium">
+            <p className="text-[11px] sm:text-xs text-[#64748B] dark:text-slate-400 font-medium truncate hidden md:block">
               {currentHeader.subtitle}
             </p>
           </div>
@@ -132,28 +132,28 @@ export function Header({ onToggleMobileMenu }) {
       </div>
 
       {/* Right Controls: Notification Icon, Theme Toggle, Profile */}
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
         {/* Notification Bell with Panel */}
         <div className="relative" ref={notificationRef}>
           <button
             type="button"
             onClick={() => setNotificationDropdownOpen(!notificationDropdownOpen)}
-            className="p-2.5 rounded-xl bg-[#F8FAFC] dark:bg-[#1A2949] border border-[#E2E8F0] dark:border-[#22385F] text-[#475569] dark:text-slate-300 hover:text-[#009688] dark:hover:text-teal-400 hover:border-teal-300 dark:hover:border-teal-600 transition-all relative focus:outline-none shadow-2xs"
+            className="p-2 sm:p-2.5 rounded-xl bg-[#F8FAFC] dark:bg-[#1A2949] border border-[#E2E8F0] dark:border-[#22385F] text-[#475569] dark:text-slate-300 hover:text-[#009688] dark:hover:text-teal-400 hover:border-teal-300 dark:hover:border-teal-600 transition-all relative focus:outline-none shadow-2xs"
             title="Notifications"
             aria-label="View notifications"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
             {unreadCount > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-[#EF4444] ring-2 ring-white dark:ring-[#131F37] animate-pulse" />
+              <span className="absolute top-1.5 right-1.5 w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-[#EF4444] ring-2 ring-white dark:ring-[#131F37] animate-pulse" />
             )}
           </button>
 
           {/* Notifications Dropdown Panel */}
           {notificationDropdownOpen && (
-            <div className="absolute right-0 mt-2.5 w-80 sm:w-96 bg-white dark:bg-[#131F37] border border-[#E2E8F0] dark:border-[#22385F] rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-              <div className="px-5 py-3.5 border-b border-[#E2E8F0] dark:border-[#22385F] flex items-center justify-between">
+            <div className="absolute right-0 mt-2.5 w-[calc(100vw-2rem)] sm:w-96 max-w-sm bg-white dark:bg-[#131F37] border border-[#E2E8F0] dark:border-[#22385F] rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+              <div className="px-4 sm:px-5 py-3 sm:py-3.5 border-b border-[#E2E8F0] dark:border-[#22385F] flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <span className="text-sm font-bold text-[#0F172A] dark:text-white">
                     Notifications
@@ -271,7 +271,7 @@ export function Header({ onToggleMobileMenu }) {
 
           {/* Profile Dropdown */}
           {profileDropdownOpen && (
-            <div className="absolute right-0 mt-2.5 w-60 bg-white dark:bg-[#131F37] border border-[#E2E8F0] dark:border-[#22385F] rounded-2xl shadow-xl z-50 py-2 animate-in fade-in zoom-in-95 duration-150">
+            <div className="absolute right-0 mt-2.5 w-60 max-w-[calc(100vw-2rem)] bg-white dark:bg-[#131F37] border border-[#E2E8F0] dark:border-[#22385F] rounded-2xl shadow-xl z-50 py-2 animate-in fade-in zoom-in-95 duration-150">
               <div className="px-4 py-2.5 border-b border-[#E2E8F0] dark:border-[#1E3150]">
                 <div className="text-xs font-bold text-[#0F172A] dark:text-white truncate">
                   {operator.fullName}

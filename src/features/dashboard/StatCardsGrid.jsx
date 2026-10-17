@@ -116,42 +116,37 @@ export function StatCardsGrid() {
   }, [activeEnrollments, enrollments, activePeople, people, trainingDate]);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5">
       {stats.map((stat) => (
         <div
           key={stat.id}
-          className={`${stat.cardBg} border ${stat.cardBorder} rounded-2xl p-5 shadow-xs flex items-center space-x-4 hover-lift transition-all relative overflow-hidden group`}
+          className={`${stat.cardBg} border ${stat.cardBorder} rounded-2xl p-4 sm:p-5 shadow-xs flex items-center space-x-3.5 sm:space-x-4 hover-lift transition-all relative overflow-hidden group`}
         >
-          {/* Multiple Color Decorative Background Circles */}
+          {/* Subtle Ambient Decorative Circles */}
           {/* 1. Large gradient corner circle */}
           <div
-            className={`absolute -top-10 -right-10 w-36 h-36 rounded-full bg-gradient-to-br ${stat.bgCircleGradient} pointer-events-none transition-transform duration-700 ease-out group-hover:scale-115`}
+            className={`absolute -top-10 -right-10 w-32 h-32 rounded-full bg-gradient-to-br ${stat.bgCircleGradient} pointer-events-none transition-transform duration-700 ease-out group-hover:scale-110 opacity-70`}
             aria-hidden="true"
           />
           {/* 2. Secondary outlined geometric ring circle */}
           <div
-            className={`absolute -bottom-8 -right-4 w-28 h-28 rounded-full border-2 ${stat.bgRingColor} pointer-events-none transition-transform duration-500 ease-out group-hover:scale-110`}
+            className={`absolute -bottom-8 -right-4 w-24 h-24 rounded-full border ${stat.bgRingColor} pointer-events-none transition-transform duration-500 ease-out group-hover:scale-105 opacity-60`}
             aria-hidden="true"
           />
-          {/* 3. Third inner floating accent circle */}
+          {/* 3. Ambient soft radial glow circle */}
           <div
-            className={`absolute top-4 right-14 w-8 h-8 rounded-full ${stat.bgDotColor} pointer-events-none transition-transform duration-500 ease-out group-hover:-translate-y-1`}
-            aria-hidden="true"
-          />
-          {/* 4. Ambient soft radial glow circle */}
-          <div
-            className={`absolute top-1/2 -right-4 -translate-y-1/2 w-20 h-20 rounded-full ${stat.bgGlowColor} blur-xl pointer-events-none`}
+            className={`absolute top-1/2 -right-4 -translate-y-1/2 w-16 h-16 rounded-full ${stat.bgGlowColor} blur-lg pointer-events-none opacity-50`}
             aria-hidden="true"
           />
 
           {/* Left Large Solid Circle with White Icon matching Figma */}
-          <div className={`relative z-10 w-13 h-13 rounded-full ${stat.circleBg} flex items-center justify-center shrink-0 shadow-sm ring-4 ring-white/60 dark:ring-white/10 group-hover:scale-105 transition-transform duration-300`}>
+          <div className={`relative z-10 w-12 h-12 sm:w-13 sm:h-13 rounded-full ${stat.circleBg} flex items-center justify-center shrink-0 shadow-sm ring-4 ring-white/60 dark:ring-white/10 group-hover:scale-105 transition-transform duration-300`}>
             {stat.icon}
           </div>
 
           {/* Right Labels and Value */}
           <div className="relative z-10 flex-1 min-w-0">
-            <div className="text-xs font-semibold text-[#64748B] dark:text-slate-400">
+            <div className="text-xs font-semibold text-[#64748B] dark:text-slate-400 truncate">
               {stat.label}
             </div>
 
@@ -159,12 +154,12 @@ export function StatCardsGrid() {
               {stat.value}
             </div>
 
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-[11px] text-[#94A3B8] dark:text-slate-400 font-medium truncate mr-1">
+            <div className="flex items-center justify-between text-xs gap-1.5">
+              <span className="text-[11px] text-[#94A3B8] dark:text-slate-400 font-medium truncate">
                 {stat.sublabel}
               </span>
-              <span className="text-[11px] font-bold text-[#10B981] bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800 flex items-center shrink-0">
-                <svg className="w-2.5 h-2.5 mr-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <span className="text-[11px] font-bold text-[#10B981] bg-emerald-50 dark:bg-emerald-950/60 px-1.5 sm:px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800 flex items-center shrink-0 whitespace-nowrap">
+                <svg className="w-2.5 h-2.5 mr-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 10l7-7m0 0l7 7m-7-7v18" />
                 </svg>
                 {stat.badge}

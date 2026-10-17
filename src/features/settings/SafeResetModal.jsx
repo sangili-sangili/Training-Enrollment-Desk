@@ -43,7 +43,7 @@ export function SafeResetModal({ isOpen, onClose, onConfirm }) {
       aria-modal="true"
       aria-labelledby="reset-modal-title"
     >
-      <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-red-200 dark:border-red-900/60 rounded-2xl shadow-2xl overflow-hidden p-6 space-y-5 animate-scale-up">
+      <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-red-200 dark:border-red-900/60 rounded-2xl shadow-2xl overflow-hidden p-5 sm:p-6 space-y-4 sm:space-y-5 animate-scale-up max-h-[90vh] overflow-y-auto">
         {/* Warning Icon & Header */}
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-950/60 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0">

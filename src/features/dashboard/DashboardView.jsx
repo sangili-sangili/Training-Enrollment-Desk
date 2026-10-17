@@ -93,7 +93,7 @@ export function DashboardView() {
 
             {/* Dropdown Panel */}
             {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-[#131F37] border border-[#E2E8F0] dark:border-[#22385F] rounded-2xl shadow-xl z-50 p-4 animate-in fade-in zoom-in-95 duration-150">
+              <div className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] bg-white dark:bg-[#131F37] border border-[#E2E8F0] dark:border-[#22385F] rounded-2xl shadow-xl z-50 p-4 animate-in fade-in zoom-in-95 duration-150">
                 <div className="text-xs font-bold text-[#0F172A] dark:text-white mb-2">
                   Select Cohort Date
                 </div>
@@ -145,7 +145,7 @@ export function DashboardView() {
                     />
                     <button
                       type="submit"
-                      className="px-3 py-1.5 text-xs font-bold text-white bg-[#009688] hover:bg-[#007F76] rounded-lg transition-colors cursor-pointer"
+                      className="px-3 py-1.5 text-xs font-bold text-white bg-[#009688] hover:bg-[#007F76] rounded-lg transition-colors cursor-pointer shrink-0"
                     >
                       Apply
                     </button>
@@ -159,7 +159,7 @@ export function DashboardView() {
 
       {/* Date Filter Notification if date has 0 records */}
       {isCustomEmpty && (
-        <div className="flex items-center justify-between p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 text-xs text-amber-800 dark:text-amber-300">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 text-xs text-amber-800 dark:text-amber-300">
           <div className="flex items-center space-x-2">
             <svg className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -171,7 +171,7 @@ export function DashboardView() {
           <button
             type="button"
             onClick={() => handleSelectPreset('2025-04-28')}
-            className="font-bold underline hover:text-amber-900 dark:hover:text-amber-200 ml-3"
+            className="font-bold underline hover:text-amber-900 dark:hover:text-amber-200 shrink-0 self-end sm:self-auto ml-2"
           >
             Reset to Apr 28, 2025
           </button>
@@ -182,7 +182,7 @@ export function DashboardView() {
       <StatCardsGrid />
 
       {/* Main Two-Panel Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <CapacityProgressPanel />
         <UpcomingSessionsList />
       </div>

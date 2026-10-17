@@ -86,8 +86,8 @@ export function PeopleTable({
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto scrollbar-thin">
+          <table className="w-full min-w-[720px] text-left border-collapse">
             <thead>
               <tr className="border-b border-[#E2E8F0] dark:border-[#1E3150] bg-slate-50/70 dark:bg-[#162540] text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                 <th className="py-3 px-4 w-12 text-center">#</th>

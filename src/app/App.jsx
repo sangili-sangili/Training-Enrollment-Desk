@@ -46,7 +46,7 @@ function MainContent() {
             onClick={() => setMobileMenuOpen(false)}
           />
           <div className="relative flex flex-col w-64 bg-[#0d2830] z-50">
-            <Sidebar className="w-full h-full" />
+            <Sidebar className="w-full h-full" onSelect={() => setMobileMenuOpen(false)} />
             <button
               onClick={() => setMobileMenuOpen(false)}
               className="absolute top-4 right-4 text-slate-300 hover:text-white p-1"
@@ -64,7 +64,7 @@ function MainContent() {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Header onToggleMobileMenu={() => setMobileMenuOpen(true)} />
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-20 md:pb-8">
+        <main className="flex-1 overflow-y-auto p-3.5 sm:p-4 md:p-8 pb-24 md:pb-8">
           <div className="max-w-7xl mx-auto space-y-6">
             {activeTab === ROUTES.DASHBOARD && <DashboardView />}
             {activeTab === ROUTES.ENROLL && <EnrollView />}

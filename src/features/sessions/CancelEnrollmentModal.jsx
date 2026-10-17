@@ -33,16 +33,16 @@ export function CancelEnrollmentModal({
       aria-modal="true"
       aria-labelledby="cancel-modal-title"
     >
-      <div className="w-full max-w-md bg-white dark:bg-[#131F37] border border-red-200 dark:border-red-900/40 rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150">
+      <div className="w-full max-w-md bg-white dark:bg-[#131F37] border border-red-200 dark:border-red-900/40 rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150 max-h-[90vh] flex flex-col">
         {/* Header Banner */}
-        <div className="bg-red-50 dark:bg-red-950/40 p-6 border-b border-red-100 dark:border-red-900/30 flex items-start space-x-4">
-          <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-900/50 text-[#EF4444] flex items-center justify-center shrink-0 shadow-inner">
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="bg-red-50 dark:bg-red-950/40 p-5 sm:p-6 border-b border-red-100 dark:border-red-900/30 flex items-start space-x-3.5 sm:space-x-4 shrink-0">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-red-100 dark:bg-red-900/50 text-[#EF4444] flex items-center justify-center shrink-0 shadow-inner">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
           </div>
           <div className="flex-1">
-            <h3 id="cancel-modal-title" className="text-lg font-bold text-[#0F172A] dark:text-white">
+            <h3 id="cancel-modal-title" className="text-base sm:text-lg font-bold text-[#0F172A] dark:text-white">
               Cancel Enrollment?
             </h3>
             <p className="text-xs text-[#64748B] dark:text-slate-400 mt-1 leading-relaxed">
@@ -52,7 +52,7 @@ export function CancelEnrollmentModal({
         </div>
 
         {/* Content Details */}
-        <div className="p-6 space-y-4">
+        <div className="p-4 sm:p-6 space-y-4 overflow-y-auto">
           <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#1A2949] border border-slate-200 dark:border-[#22385F] space-y-2">
             <div className="flex justify-between items-center text-xs">
               <span className="text-slate-500 dark:text-slate-400">Participant:</span>

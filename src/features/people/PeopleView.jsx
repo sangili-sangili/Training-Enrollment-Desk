@@ -191,12 +191,12 @@ export function PeopleView() {
         <button
           type="button"
           onClick={() => setActiveTab(ROUTES.ENROLL)}
-          className="flex items-center space-x-2 px-4 py-2 bg-[#009688] hover:bg-[#00897B] text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm hover:shadow transition-all cursor-pointer self-start sm:self-auto"
+          className="flex items-center space-x-2 px-3.5 sm:px-4 py-2 bg-[#009688] hover:bg-[#00897B] text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm hover:shadow transition-all cursor-pointer self-start sm:self-auto whitespace-nowrap"
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
           </svg>
-          <span>+ Enroll Participant</span>
+          <span>Enroll Participant</span>
         </button>
       </div>
 

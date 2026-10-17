@@ -18,9 +18,9 @@ export function PeopleFilterToolbar({
   const isFiltered = searchQuery !== '' || selectedCompany !== 'ALL' || selectedStatus !== 'ALL';
 
   return (
-    <div className="bg-white dark:bg-[#131F37] border border-[#E2E8F0] dark:border-[#1E3150] rounded-2xl p-4 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+    <div className="bg-white dark:bg-[#131F37] border border-[#E2E8F0] dark:border-[#1E3150] rounded-2xl p-4 shadow-xs flex flex-col xl:flex-row xl:items-center justify-between gap-3">
       {/* Search Input */}
-      <div className="relative flex-1 min-w-[240px]">
+      <div className="relative flex-1 min-w-0 w-full xl:min-w-[280px]">
         <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

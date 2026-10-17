@@ -27,7 +27,7 @@ export function Badge({
   const selectedVariant = variantStyles[variant] || variantStyles.default;
 
   return (
-    <span className={`inline-flex items-center font-medium rounded-full ${sizeStyles[size]} ${selectedVariant} ${className}`}>
+    <span className={`inline-flex items-center font-medium rounded-full whitespace-nowrap shrink-0 ${sizeStyles[size]} ${selectedVariant} ${className}`}>
       {children}
     </span>
   );

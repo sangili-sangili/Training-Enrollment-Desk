@@ -17,25 +17,25 @@ export function SettingsView() {
   return (
     <div className="space-y-6 animate-fade-in pb-12">
       {/* Page Title & Operational Badge */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl md:text-3xl font-black text-[#0F172A] dark:text-white tracking-tight">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 sm:gap-4">
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+            <h1 className="text-xl sm:text-2xl font-extrabold text-[#0F172A] dark:text-white tracking-tight">
               Workspace Settings &amp; Telemetry
             </h1>
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 whitespace-nowrap shrink-0">
               <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
               All Systems Operational
             </span>
           </div>
-          <p className="text-sm text-[#64748B] dark:text-slate-400 mt-1">
+          <p className="text-xs sm:text-sm text-[#64748B] dark:text-slate-400 mt-1 max-w-2xl leading-normal">
             Manage administrator credentials, monitor storage health, export backups, and review training policies
           </p>
         </div>
 
-        <div className="flex items-center gap-2 self-start sm:self-center">
+        <div className="flex items-center gap-2 self-start xl:self-center shrink-0">
           <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Environment:</span>
-          <span className="px-2.5 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/40 text-[#007F76] dark:text-teal-300 border border-teal-200 dark:border-teal-800 font-mono text-xs font-bold">
+          <span className="px-2.5 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/40 text-[#007F76] dark:text-teal-300 border border-teal-200 dark:border-teal-800 font-mono text-xs font-bold whitespace-nowrap">
             CLIENT-LOCAL v1.0
           </span>
         </div>

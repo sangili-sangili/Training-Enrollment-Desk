@@ -5,7 +5,7 @@ import { useEnrollment } from '../../app/context/useEnrollment.js';
  * Main Desktop & Tablet Sidebar Navigation
  * Increased icon sizes and matched Figma styling
  */
-export function Sidebar({ className = '' }) {
+export function Sidebar({ className = '', onSelect }) {
   const { activeTab, setActiveTab, operator } = useEnrollment();
 
   return (
@@ -37,7 +37,10 @@ export function Sidebar({ className = '' }) {
               <button
                 key={item.id}
                 type="button"
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => {
+                  setActiveTab(item.id);
+                  onSelect?.();
+                }}
                 className={`w-full flex items-center space-x-3.5 px-3.5 py-3 rounded-xl text-sm font-semibold transition-all ${
                   isActive
                     ? 'bg-[#009688] text-white shadow-md shadow-teal-600/30'
