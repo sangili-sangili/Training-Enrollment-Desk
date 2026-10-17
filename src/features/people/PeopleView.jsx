@@ -55,20 +55,32 @@ export function PeopleView() {
     return Array.from(set).sort();
   }, [people]);
 
-  // Precompute participant enrollment map
-  const personEnrollmentsMap = useMemo(() => {
+  // Precompute participant stats map once in O(E) time for all child components
+  const personStatsMap = useMemo(() => {
     const map = new Map();
     for (let i = 0; i < enrollments.length; i++) {
       const enr = enrollments[i];
       if (!map.has(enr.personId)) {
-        map.set(enr.personId, []);
+        map.set(enr.personId, {
+          enrollments: [],
+          totalPaid: 0,
+          confirmedCount: 0,
+          waitlistedCount: 0
+        });
       }
-      map.get(enr.personId).push(enr);
+      const item = map.get(enr.personId);
+      item.enrollments.push(enr);
+      if (enr.status === 'Confirmed') {
+        item.confirmedCount++;
+        item.totalPaid += (enr.finalPrice || 0);
+      } else if (enr.status === 'Waitlisted') {
+        item.waitlistedCount++;
+      }
     }
     return map;
   }, [enrollments]);
 
-  // Filtered people list
+  // Filtered people list with O(1) status lookups
   const filteredPeople = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
 
@@ -81,16 +93,16 @@ export function PeopleView() {
         }
       }
 
-      // 2. Status filter
+      // 2. Status filter: O(1) precomputed counter lookups
       if (selectedStatus !== 'ALL') {
-        const personEnrs = personEnrollmentsMap.get(person.id) || [];
-        if (selectedStatus === 'CONFIRMED' && !personEnrs.some(e => e.status === 'Confirmed')) {
+        const stats = personStatsMap.get(person.id);
+        if (selectedStatus === 'CONFIRMED' && (!stats || stats.confirmedCount === 0)) {
           return false;
         }
-        if (selectedStatus === 'WAITLISTED' && !personEnrs.some(e => e.status === 'Waitlisted')) {
+        if (selectedStatus === 'WAITLISTED' && (!stats || stats.waitlistedCount === 0)) {
           return false;
         }
-        if (selectedStatus === 'MULTI' && personEnrs.length < 2) {
+        if (selectedStatus === 'MULTI' && (!stats || stats.enrollments.length < 2)) {
           return false;
         }
       }
@@ -108,7 +120,7 @@ export function PeopleView() {
 
       return true;
     });
-  }, [people, searchQuery, selectedCompany, selectedStatus, personEnrollmentsMap]);
+  }, [people, searchQuery, selectedCompany, selectedStatus, personStatsMap]);
 
   // Action handlers
   const handleResetFilters = useCallback(() => {
@@ -192,6 +204,7 @@ export function PeopleView() {
       <PeopleSummaryCards
         people={people}
         enrollments={enrollments}
+        uniqueCompaniesCount={uniqueCompanies.length}
       />
 
       {/* Multi-criteria Filter Toolbar with Table / Grid View Switcher */}
@@ -213,7 +226,7 @@ export function PeopleView() {
       {viewMode === 'table' ? (
         <PeopleTable
           people={filteredPeople}
-          enrollments={enrollments}
+          personStatsMap={personStatsMap}
           sessionsMap={sessionsMap}
           onSelectPerson={setSelectedPerson}
           onEnrollNewSession={handleEnrollNewSession}
@@ -221,7 +234,7 @@ export function PeopleView() {
       ) : (
         <PeopleCardGrid
           people={filteredPeople}
-          enrollments={enrollments}
+          personStatsMap={personStatsMap}
           sessionsMap={sessionsMap}
           onSelectPerson={setSelectedPerson}
           onEnrollNewSession={handleEnrollNewSession}
@@ -232,7 +245,7 @@ export function PeopleView() {
       {selectedPerson && (
         <TraineeDetailsModal
           person={selectedPerson}
-          enrollments={enrollments}
+          personStatsMap={personStatsMap}
           sessionsMap={sessionsMap}
           onClose={() => setSelectedPerson(null)}
           onEnrollNewSession={handleEnrollNewSession}

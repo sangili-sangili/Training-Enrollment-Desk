@@ -35,7 +35,3 @@ The **Dashboard** screen (`/` or `ROUTES.DASHBOARD`) is the primary landing view
 - **`useEnrollment()`**: Consumes `people`, `enrollments`, `sessions`, `trainingDate`, `setTrainingDate`, and `theme`.
 - **Derived State**: All stat card values and occupancy percentages are derived dynamically on every render from live persisted data. No duplicate or stale state is stored.
 
----
-
-## 4. Test Verification
-- Tested via domain logic and persistence test suites (`phase3_storage.test.js`, `phase4_domain_business_logic.test.js`).

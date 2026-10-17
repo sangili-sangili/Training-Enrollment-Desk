@@ -28,8 +28,3 @@ The **Enroll People** screen (`/enroll` or `ROUTES.ENROLL`) provides a registrat
 5. **`ConflictModal.jsx`**
    - Pop-up modal explaining exact time window collisions (e.g. 09:30-11:00) when a participant has an existing confirmed seat or selected an intra-batch conflict.
 
----
-
-## 3. Automated Test Verification
-- Tested via `tests/phase5_enrollment_screen.test.js` (14 tests passing).
-- Validates normalization, existing person reuse, schedule collision prevention, capacity threshold routing, and discount precedence.

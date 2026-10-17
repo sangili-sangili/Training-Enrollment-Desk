@@ -1,46 +1,6 @@
 import { useEffect } from 'react';
 import { Button } from '../../components/ui/Button.jsx';
-
-/**
- * Format currency to Indian Rupee (INR)
- */
-function formatCurrency(amount) {
-  if (typeof amount !== 'number' || isNaN(amount)) return '₹0';
-  return `₹${amount.toLocaleString('en-IN')}`;
-}
-
-/**
- * Generate 2-letter initials from name
- */
-function getInitials(name) {
-  if (!name) return '??';
-  const parts = name.trim().split(/\s+/);
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-}
-
-/**
- * Stable avatar color background based on name
- */
-const AVATAR_COLORS = [
-  'bg-teal-500 text-white',
-  'bg-blue-600 text-white',
-  'bg-indigo-600 text-white',
-  'bg-purple-600 text-white',
-  'bg-emerald-600 text-white',
-  'bg-amber-600 text-white',
-  'bg-rose-600 text-white'
-];
-
-function getAvatarColor(name) {
-  if (!name) return AVATAR_COLORS[0];
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const index = Math.abs(hash) % AVATAR_COLORS.length;
-  return AVATAR_COLORS[index];
-}
+import { formatCurrency, getInitials, getAvatarColor } from './peopleHelpers.js';
 
 /**
  * Trainee Details Slide-over / Modal
@@ -49,6 +9,7 @@ function getAvatarColor(name) {
 export function TraineeDetailsModal({
   person,
   enrollments = [],
+  personStatsMap: externalStatsMap,
   sessionsMap = new Map(),
   onClose,
   onEnrollNewSession,
@@ -70,21 +31,27 @@ export function TraineeDetailsModal({
   const initials = getInitials(person.fullName);
   const avatarColor = getAvatarColor(person.fullName);
 
-  // Filter enrollments for this specific person
-  const personEnrollments = enrollments.filter(e => e.personId === person.id);
-
-  let confirmedCount = 0;
-  let waitlistedCount = 0;
-  let totalInvestment = 0;
-
-  for (const enr of personEnrollments) {
-    if (enr.status === 'Confirmed') {
-      confirmedCount++;
-      totalInvestment += (enr.finalPrice || 0);
-    } else if (enr.status === 'Waitlisted') {
-      waitlistedCount++;
+  // Read precomputed stats or compute safely
+  const stats = externalStatsMap?.get(person.id) || (() => {
+    const list = enrollments.filter(e => e.personId === person.id);
+    let paid = 0;
+    let conf = 0;
+    let wait = 0;
+    for (const enr of list) {
+      if (enr.status === 'Confirmed') {
+        conf++;
+        paid += (enr.finalPrice || 0);
+      } else if (enr.status === 'Waitlisted') {
+        wait++;
+      }
     }
-  }
+    return { enrollments: list, totalPaid: paid, confirmedCount: conf, waitlistedCount: wait };
+  })();
+
+  const personEnrollments = stats.enrollments;
+  const confirmedCount = stats.confirmedCount;
+  const waitlistedCount = stats.waitlistedCount;
+  const totalInvestment = stats.totalPaid;
 
   return (
     <div

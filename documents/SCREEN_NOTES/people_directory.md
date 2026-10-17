@@ -20,8 +20,3 @@ The **Trainee Directory / People Registry** screen (`/people` or `ROUTES.PEOPLE`
 6. **Pre-fill Trainee Workflow**
    - Clicking `+ Enroll` passes trainee details to `EnrollView`, auto-populating their name, email, and company for streamlined multi-session registration.
 
----
-
-## 3. Automated Test Verification
-- Tested via `tests/phase7_trainee_directory_screen.test.js` (11 tests passing).
-- Tests summary metric calculations, multi-criteria participant filtering, session history retrieval, individual tuition summation, and pre-fill workflow data integrity.

@@ -25,10 +25,23 @@ export function StorageDiagnosticsCard() {
 
     const kbUsed = (bytesUsed / 1024).toFixed(2);
 
-    const confirmedCount = enrollments.filter(e => e.status === 'Confirmed').length;
-    const waitlistedCount = enrollments.filter(e => e.status === 'Waitlisted').length;
-    const offeredCount = enrollments.filter(e => e.status === 'Offered').length;
-    const cancelledCount = enrollments.filter(e => e.status === 'Cancelled').length;
+    let confirmedCount = 0;
+    let waitlistedCount = 0;
+    let offeredCount = 0;
+    let cancelledCount = 0;
+
+    for (let i = 0; i < enrollments.length; i++) {
+      const status = enrollments[i].status;
+      if (status === 'Confirmed') confirmedCount++;
+      else if (status === 'Waitlisted') waitlistedCount++;
+      else if (status === 'Offered') offeredCount++;
+      else if (status === 'Cancelled') cancelledCount++;
+    }
+
+    let totalCapacity = 0;
+    for (let i = 0; i < sessions.length; i++) {
+      totalCapacity += sessions[i].capacity || 0;
+    }
 
     return {
       bytesUsed,
@@ -37,7 +50,7 @@ export function StorageDiagnosticsCard() {
       waitlistedCount,
       offeredCount,
       cancelledCount,
-      totalCapacity: sessions.reduce((acc, s) => acc + s.capacity, 0)
+      totalCapacity
     };
   }, [enrollments, sessions]);
 

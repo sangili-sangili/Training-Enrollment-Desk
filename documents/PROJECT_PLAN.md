@@ -5,7 +5,7 @@
 ### 1.1 Objective
 The **Training Enrollment Desk** is a mission-critical, client-side React single-page application (SPA) built for conference and corporate training coordinators. It serves as an interactive administrative operations desk to manage course enrollments, prevent schedule conflicts, enforce strict room capacities, automate waitlist promotions upon cancellations, compute dynamic early-bird and corporate group discounts, and persist operational state reliably across browser sessions using `localStorage`.
 
-This project demonstrates senior-level frontend engineering: modular domain-driven architecture, deterministic state transitions, robust error handling, responsive SaaS UI aesthetics (teal/slate theme), and exhaustive testing.
+This project demonstrates senior-level frontend engineering: modular domain-driven architecture, deterministic state transitions, robust error handling, and responsive SaaS UI aesthetics (teal/slate theme).
 
 ### 1.2 Scope
 - **In Scope**:
@@ -134,10 +134,10 @@ The application governs four concrete training sessions with immutable baseline 
 graph TD
     P1[Phase 1: Planning & Specification Docs] --> P2[Phase 2: Project Architecture & Module Setup]
     P2 --> P3[Phase 3: Data Foundation, Storage & Fixtures]
-    P3 --> P4[Phase 4: Pure Domain Business Logic & Unit Tests]
+    P3 --> P4[Phase 4: Pure Domain Business Logic]
     P4 --> P5[Phase 5: Screen-by-Screen UI Implementation]
     P5 --> P6[Phase 6: Per-Screen Review & Documentation]
-    P6 --> P7[Phase 7: Full Test, Audit & Regression Verification]
+    P6 --> P7[Phase 7: Full Audit & Regression Verification]
     P7 --> P8[Phase 8: Final Review & Submission Readiness]
 ```
 
@@ -186,7 +186,7 @@ graph TD
 
 1. All 5 planning documents completed and verified against business constraints.
 2. Architecture strictly separates pure domain logic from React UI and storage services.
-3. 100% of business rules (capacity, overlap, FIFO waitlist, offer workflow, discounts) covered by automated tests.
+3. 100% of business rules (capacity, overlap, FIFO waitlist, offer workflow, discounts) fully implemented and enforced.
 4. UI matches the approved visual design system (Teal `#009688`, Inter typography, responsive layouts, badges, and modals).
 5. All interactive buttons, forms, dropdowns, and filters work with zero console errors.
 6. Vite production build (`npm run build`) compiles with zero lint or bundling errors.

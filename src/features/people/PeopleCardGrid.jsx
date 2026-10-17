@@ -1,45 +1,5 @@
 import { useMemo } from 'react';
-
-/**
- * Format currency to Indian Rupee (INR)
- */
-function formatCurrency(amount) {
-  if (typeof amount !== 'number' || isNaN(amount)) return '₹0';
-  return `₹${amount.toLocaleString('en-IN')}`;
-}
-
-/**
- * Generate 2-letter initials from name
- */
-function getInitials(name) {
-  if (!name) return '??';
-  const parts = name.trim().split(/\s+/);
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-}
-
-/**
- * Stable avatar color background based on name
- */
-const AVATAR_COLORS = [
-  'bg-teal-500 text-white',
-  'bg-blue-600 text-white',
-  'bg-indigo-600 text-white',
-  'bg-purple-600 text-white',
-  'bg-emerald-600 text-white',
-  'bg-amber-600 text-white',
-  'bg-rose-600 text-white'
-];
-
-function getAvatarColor(name) {
-  if (!name) return AVATAR_COLORS[0];
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const index = Math.abs(hash) % AVATAR_COLORS.length;
-  return AVATAR_COLORS[index];
-}
+import { formatCurrency, getInitials, getAvatarColor } from './peopleHelpers.js';
 
 /**
  * PeopleCardGrid Component
@@ -48,14 +8,16 @@ function getAvatarColor(name) {
 export function PeopleCardGrid({
   people = [],
   enrollments = [],
+  personStatsMap: externalStatsMap,
   sessionsMap = new Map(),
   onSelectPerson,
   onEnrollNewSession
 }) {
-  // Precompute participant session records
+  // Use precomputed personStatsMap from parent or fallback compute
   const personStatsMap = useMemo(() => {
-    const map = new Map();
+    if (externalStatsMap) return externalStatsMap;
 
+    const map = new Map();
     for (let i = 0; i < enrollments.length; i++) {
       const enr = enrollments[i];
       if (!map.has(enr.personId)) {
@@ -75,9 +37,8 @@ export function PeopleCardGrid({
         item.waitlistedCount++;
       }
     }
-
     return map;
-  }, [enrollments]);
+  }, [externalStatsMap, enrollments]);
 
   if (people.length === 0) {
     return (

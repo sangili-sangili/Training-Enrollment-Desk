@@ -1,59 +1,7 @@
 import { useState, useMemo } from 'react';
+import { formatCurrency, formatDate, getInitials, getAvatarColor } from './peopleHelpers.js';
 
-/**
- * Format currency to Indian Rupee (INR)
- */
-function formatCurrency(amount) {
-  if (typeof amount !== 'number' || isNaN(amount)) return '₹0';
-  return `₹${amount.toLocaleString('en-IN')}`;
-}
-
-/**
- * Format date string to readable label
- */
-function formatDate(dateStr) {
-  if (!dateStr) return '—';
-  try {
-    const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return dateStr;
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  } catch {
-    return dateStr;
-  }
-}
-
-/**
- * Generate 2-letter initials from name
- */
-function getInitials(name) {
-  if (!name) return '??';
-  const parts = name.trim().split(/\s+/);
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-}
-
-/**
- * Stable avatar color background based on name
- */
-const AVATAR_COLORS = [
-  'bg-teal-500 text-white',
-  'bg-blue-600 text-white',
-  'bg-indigo-600 text-white',
-  'bg-purple-600 text-white',
-  'bg-emerald-600 text-white',
-  'bg-amber-600 text-white',
-  'bg-rose-600 text-white'
-];
-
-function getAvatarColor(name) {
-  if (!name) return AVATAR_COLORS[0];
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const index = Math.abs(hash) % AVATAR_COLORS.length;
-  return AVATAR_COLORS[index];
-}
+const PAGE_SIZE = 10;
 
 /**
  * PeopleTable Component
@@ -62,17 +10,18 @@ function getAvatarColor(name) {
 export function PeopleTable({
   people = [],
   enrollments = [],
+  personStatsMap: externalStatsMap,
   sessionsMap = new Map(),
   onSelectPerson,
   onEnrollNewSession
 }) {
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
 
-  // Precompute participant session records in a single map for O(1) lookups
+  // Use precomputed personStatsMap from parent, or fallback compute if not passed
   const personStatsMap = useMemo(() => {
-    const map = new Map();
+    if (externalStatsMap) return externalStatsMap;
 
+    const map = new Map();
     for (let i = 0; i < enrollments.length; i++) {
       const enr = enrollments[i];
       if (!map.has(enr.personId)) {
@@ -92,19 +41,18 @@ export function PeopleTable({
         item.waitlistedCount++;
       }
     }
-
     return map;
-  }, [enrollments]);
+  }, [externalStatsMap, enrollments]);
 
   // Pagination math
   const totalItems = people.length;
-  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
   const safePage = Math.min(currentPage, totalPages);
 
   const paginatedPeople = useMemo(() => {
-    const start = (safePage - 1) * pageSize;
-    return people.slice(start, start + pageSize);
-  }, [people, safePage, pageSize]);
+    const start = (safePage - 1) * PAGE_SIZE;
+    return people.slice(start, start + PAGE_SIZE);
+  }, [people, safePage]);
 
   return (
     <div className="bg-white dark:bg-[#131F37] border border-[#E2E8F0] dark:border-[#1E3150] rounded-2xl shadow-xs overflow-hidden">
@@ -160,7 +108,7 @@ export function PeopleTable({
                   confirmedCount: 0,
                   waitlistedCount: 0
                 };
-                const rowNumber = (safePage - 1) * pageSize + index + 1;
+                const rowNumber = (safePage - 1) * PAGE_SIZE + index + 1;
                 const initials = getInitials(person.fullName);
                 const avatarColor = getAvatarColor(person.fullName);
 
@@ -295,9 +243,9 @@ export function PeopleTable({
       {totalPages > 1 && (
         <div className="px-6 py-4 border-t border-[#E2E8F0] dark:border-[#1E3150] bg-slate-50/50 dark:bg-[#182744] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="text-xs text-[#64748B] dark:text-slate-400">
-            Showing <span className="font-bold text-[#0F172A] dark:text-white">{(safePage - 1) * pageSize + 1}</span> to{' '}
+            Showing <span className="font-bold text-[#0F172A] dark:text-white">{(safePage - 1) * PAGE_SIZE + 1}</span> to{' '}
             <span className="font-bold text-[#0F172A] dark:text-white">
-              {Math.min(safePage * pageSize, totalItems)}
+              {Math.min(safePage * PAGE_SIZE, totalItems)}
             </span>{' '}
             of <span className="font-bold text-[#0F172A] dark:text-white">{totalItems}</span> participants
           </div>

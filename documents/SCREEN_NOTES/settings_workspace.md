@@ -67,13 +67,3 @@ The **Workspace Settings & System Telemetry** screen (`/settings` or `ROUTES.SET
 - Responsive CSS grid adapting from single column on mobile to 6-column telemetry on desktop.
 - Visible focus rings (`focus:ring-2`, `focus:ring-red-500`) on all interactive inputs.
 
----
-
-## 7. Automated Test Verification
-- Test Suite: `tests/phase8_settings_workspace_screen.test.js` (10 tests passing).
-- Tests cover:
-  1. Operator identity & credential validation rules.
-  2. Storage telemetry calculations and capacity invariants.
-  3. JSON backup and CSV roster format serialization.
-  4. Safe reset input guard and baseline fixture restoration.
-  5. Session catalog specifications and overlap matrix.

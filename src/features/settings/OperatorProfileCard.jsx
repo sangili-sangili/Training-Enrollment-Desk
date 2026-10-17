@@ -1,4 +1,5 @@
 import { useEnrollment } from '../../app/context/EnrollmentContext.jsx';
+import { getInitials } from '../people/peopleHelpers.js';
 
 /**
  * Operator Profile & Identity Card
@@ -16,9 +17,7 @@ export function OperatorProfileCard() {
         <div className="flex items-center gap-4">
           {/* Avatar with gradient and initials */}
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#009688] to-teal-400 text-white font-extrabold text-xl flex items-center justify-center shadow-md shadow-teal-500/20 shrink-0">
-            {operator?.fullName
-              ? operator.fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
-              : 'AD'}
+            {getInitials(operator?.fullName)}
           </div>
 
           <div>

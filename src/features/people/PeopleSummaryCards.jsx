@@ -1,12 +1,5 @@
 import { useMemo } from 'react';
-
-/**
- * Format currency to Indian Rupee (INR)
- */
-function formatCurrency(amount) {
-  if (typeof amount !== 'number' || isNaN(amount)) return '₹0';
-  return `₹${amount.toLocaleString('en-IN')}`;
-}
+import { formatCurrency } from './peopleHelpers.js';
 
 /**
  * 4 Top Metric Cards for Trainee Directory
@@ -14,18 +7,22 @@ function formatCurrency(amount) {
  */
 export function PeopleSummaryCards({
   people = [],
-  enrollments = []
+  enrollments = [],
+  uniqueCompaniesCount
 }) {
   const summary = useMemo(() => {
     const totalPeople = people.length;
 
-    // Unique companies count (excluding empty)
-    const companySet = new Set();
-    people.forEach(p => {
-      const trimmed = (p.company || '').trim();
-      if (trimmed) companySet.add(trimmed.toLowerCase());
-    });
-    const uniqueCompanies = companySet.size;
+    // Use precomputed unique companies if provided, or calculate cleanly
+    let uniqueCompanies = uniqueCompaniesCount;
+    if (typeof uniqueCompanies !== 'number') {
+      const companySet = new Set();
+      for (let i = 0; i < people.length; i++) {
+        const trimmed = (people[i].company || '').trim();
+        if (trimmed) companySet.add(trimmed.toLowerCase());
+      }
+      uniqueCompanies = companySet.size;
+    }
 
     // Active enrollments count & total revenue
     let activeEnrollmentCount = 0;
@@ -51,7 +48,7 @@ export function PeopleSummaryCards({
       totalRevenue,
       waitlistedCount
     };
-  }, [people, enrollments]);
+  }, [people, enrollments, uniqueCompaniesCount]);
 
   const cards = [
     {

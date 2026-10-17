@@ -21,8 +21,3 @@ The **Session Management & Participant Roster** screen (`/sessions` or `ROUTES.S
 6. **`PriceBreakdownModal.jsx`**
    - Itemized tuition modal showing base price, discount name, rate percentage, deduction amount, and final charge.
 
----
-
-## 3. Automated Test Verification
-- Tested via `tests/phase6_sessions_roster_screen.test.js` (14 tests passing).
-- Tests session occupancy math, multi-criteria filtering, price breakdown audits, seat cancellation with waitlist promotion, and offer acceptance/decline workflows.
