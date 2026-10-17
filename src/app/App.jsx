@@ -7,12 +7,13 @@ import { DashboardView } from '../features/dashboard/index.js';
 import { EnrollView } from '../features/enrollment/index.js';
 import { SessionsView } from '../features/sessions/index.js';
 import { PeopleView } from '../features/people/index.js';
+import { SettingsView } from '../features/settings/index.js';
 import { LoginView } from '../features/authentication/index.js';
 
 
 
 function MainContent() {
-  const { activeTab, handleResetData, isAuthenticated, theme } = useEnrollment();
+  const { activeTab, isAuthenticated, theme } = useEnrollment();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // If unauthenticated (e.g. operator logged out), show Login Screen with credentials
@@ -70,24 +71,7 @@ function MainContent() {
             {activeTab === ROUTES.SESSIONS && <SessionsView />}
 
             {activeTab === ROUTES.PEOPLE && <PeopleView />}
-
-            {activeTab === ROUTES.SETTINGS && (
-              <div className="bg-white dark:bg-slate-900 border border-[#E2E8F0] dark:border-slate-800 rounded-2xl p-8 shadow-xs space-y-4">
-                <h2 className="text-xl font-bold text-[#0F172A] dark:text-white">Workspace Settings</h2>
-                <p className="text-sm text-[#64748B] dark:text-slate-400">
-                  Reset development storage back to baseline seed fixtures (24 people, 18 confirmed, 6 waitlisted).
-                </p>
-                <div>
-                  <button
-                    type="button"
-                    onClick={handleResetData}
-                    className="px-4 py-2 text-sm font-semibold rounded-xl bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50 border border-red-200 dark:border-red-800 transition-colors"
-                  >
-                    Reset Storage to Default Seed Fixtures
-                  </button>
-                </div>
-              </div>
-            )}
+            {activeTab === ROUTES.SETTINGS && <SettingsView />}
           </div>
         </main>
 
