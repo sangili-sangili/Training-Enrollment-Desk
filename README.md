@@ -133,11 +133,13 @@ npm run preview
 
 ```
 Training-Enrollment-Desk/
+├── DECISIONS.md                   # Key business logic, pricing, and architecture decisions
 ├── documents/                     # Project planning & architectural specifications
 │   ├── PROJECT_PLAN.md            # Requirements, scope, and DoD
 │   ├── BUSINESS_RULES.md          # Domain rules, pricing math, capacity rules
 │   ├── TECHNICAL_ARCHITECTURE.md  # Architecture, folder boundaries, state flow
 │   ├── FINAL_REVIEW.md            # Comprehensive post-implementation review
+│   ├── DECISIONS.md               # Key business logic & architectural decisions
 │   └── SCREEN_NOTES/              # Detailed per-screen architectural notes
 │       ├── dashboard.md
 │       ├── enroll_people.md
