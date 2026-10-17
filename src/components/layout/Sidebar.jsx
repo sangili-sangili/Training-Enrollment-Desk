@@ -12,22 +12,31 @@ export function Sidebar({ className = '', onSelect }) {
     <aside className={`w-64 bg-[#0d2830] dark:bg-[#07131b] text-slate-200 flex flex-col justify-between shrink-0 select-none transition-colors ${className}`}>
       {/* Top Branding */}
       <div>
-        <div className="h-18 px-6 flex items-center space-x-3.5 border-b border-[#163842] dark:border-[#0f2831]">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#009688] to-teal-400 flex items-center justify-center text-white shadow-md shadow-teal-500/20">
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTab(ROUTES.DASHBOARD);
+            onSelect?.();
+          }}
+          className="w-full h-18 px-6 flex items-center space-x-3.5 border-b border-[#163842] dark:border-[#0f2831] text-left cursor-pointer hover:bg-[#163842]/40 dark:hover:bg-[#122830]/40 transition-colors group focus:outline-none"
+          title="Go to Dashboard"
+          aria-label="Go to Dashboard"
+        >
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#009688] to-teal-400 flex items-center justify-center text-white shadow-md shadow-teal-500/20 group-hover:scale-105 transition-transform shrink-0">
             {/* Graduation Cap / Desk Icon */}
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
             </svg>
           </div>
           <div>
-            <div className="text-sm font-extrabold text-white tracking-tight leading-none">
+            <div className="text-sm font-extrabold text-white tracking-tight leading-none group-hover:text-teal-200 transition-colors">
               Training
             </div>
             <div className="text-xs text-teal-300 font-semibold mt-0.5">
               Enrollment Desk
             </div>
           </div>
-        </div>
+        </button>
 
         {/* Navigation Links with larger icons */}
         <nav className="p-3.5 space-y-1.5">

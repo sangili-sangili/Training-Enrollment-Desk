@@ -36,11 +36,15 @@ const TITLE_MAP = {
 export function Header({ onToggleMobileMenu }) {
   const {
     activeTab,
+    setActiveTab,
     theme,
     toggleTheme,
     operator,
     logout,
-    setProfileModalOpen
+    setProfileModalOpen,
+    notifications,
+    markAllNotificationsAsRead,
+    clearAllNotifications
   } = useEnrollment();
 
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -63,44 +67,25 @@ export function Header({ onToggleMobileMenu }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      title: 'Seat offered for React',
-      message: 'Waitlisted seat is now available for John Doe.',
-      time: '2m ago',
-      unread: true,
-      type: 'offered'
-    },
-    {
-      id: 2,
-      title: 'Enrollment confirmed',
-      message: 'John Doe confirmed for System Design.',
-      time: '10m ago',
-      unread: true,
-      type: 'confirmed'
-    },
-    {
-      id: 3,
-      title: 'Session cancelled',
-      message: 'Testing session seat vacated and processed.',
-      time: '1h ago',
-      unread: false,
-      type: 'cancelled'
-    }
-  ]);
+  const unreadCount = useMemo(() => (notifications || []).filter(n => n.unread).length, [notifications]);
 
-  const unreadCount = useMemo(() => notifications.filter(n => n.unread).length, [notifications]);
-
-  const markAllAsRead = useCallback(() => {
-    setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
-  }, []);
+  const formatTimeAgo = (createdAt, fallback) => {
+    if (!createdAt) return fallback || 'Recently';
+    const diffSec = Math.floor((Date.now() - createdAt) / 1000);
+    if (diffSec < 60) return 'Just now';
+    const diffMin = Math.floor(diffSec / 60);
+    if (diffMin < 60) return `${diffMin}m ago`;
+    const diffHour = Math.floor(diffMin / 60);
+    if (diffHour < 24) return `${diffHour}h ago`;
+    const diffDay = Math.floor(diffHour / 24);
+    return `${diffDay}d ago`;
+  };
 
   const currentHeader = TITLE_MAP[activeTab] || TITLE_MAP[ROUTES.DASHBOARD];
 
   return (
     <header className="h-18 bg-white dark:bg-[#131F37] border-b border-[#E2E8F0] dark:border-[#1E3150] px-4 md:px-8 flex items-center justify-between shrink-0 transition-colors">
-      {/* Left: Mobile Toggle & Page Title */}
+      {/* Left: Mobile Toggle & Page Title (Clickable to Dashboard) */}
       <div className="flex items-center space-x-2.5 sm:space-x-3.5 min-w-0 flex-1 mr-2 sm:mr-4">
         <button
           type="button"
@@ -115,15 +100,29 @@ export function Header({ onToggleMobileMenu }) {
 
         {activeTab === ROUTES.DASHBOARD ? (
           <div className="flex items-center space-x-1.5 sm:space-x-2 text-xs font-semibold text-[#64748B] dark:text-slate-400 truncate">
-            <span className="text-[#009688] dark:text-teal-400 font-bold whitespace-nowrap">Training Desk</span>
+            <button
+              type="button"
+              onClick={() => setActiveTab(ROUTES.DASHBOARD)}
+              className="text-[#009688] dark:text-teal-400 font-bold whitespace-nowrap hover:underline cursor-pointer focus:outline-none"
+              title="Go to Dashboard"
+            >
+              Training Desk
+            </button>
             <span className="hidden sm:inline">/</span>
             <span className="hidden sm:inline truncate">Workspace Overview</span>
           </div>
         ) : (
           <div className="min-w-0 flex-1">
-            <h1 className="text-sm sm:text-lg md:text-xl font-extrabold text-[#0F172A] dark:text-white leading-tight tracking-tight truncate">
-              {currentHeader.title}
-            </h1>
+            <button
+              type="button"
+              onClick={() => setActiveTab(ROUTES.DASHBOARD)}
+              className="text-left group focus:outline-none max-w-full block"
+              title="Go to Dashboard"
+            >
+              <h1 className="text-sm sm:text-lg md:text-xl font-extrabold text-[#0F172A] dark:text-white leading-tight tracking-tight truncate group-hover:text-[#009688] dark:group-hover:text-teal-400 transition-colors">
+                {currentHeader.title}
+              </h1>
+            </button>
             <p className="text-[11px] sm:text-xs text-[#64748B] dark:text-slate-400 font-medium truncate hidden md:block">
               {currentHeader.subtitle}
             </p>
@@ -138,7 +137,7 @@ export function Header({ onToggleMobileMenu }) {
           <button
             type="button"
             onClick={() => setNotificationDropdownOpen(!notificationDropdownOpen)}
-            className="p-2 sm:p-2.5 rounded-xl bg-[#F8FAFC] dark:bg-[#1A2949] border border-[#E2E8F0] dark:border-[#22385F] text-[#475569] dark:text-slate-300 hover:text-[#009688] dark:hover:text-teal-400 hover:border-teal-300 dark:hover:border-teal-600 transition-all relative focus:outline-none shadow-2xs"
+            className="p-2 sm:p-2.5 rounded-xl bg-[#F8FAFC] dark:bg-[#1A2949] border border-[#E2E8F0] dark:border-[#22385F] text-[#475569] dark:text-slate-300 hover:text-[#009688] dark:hover:text-teal-400 hover:border-teal-300 dark:hover:border-teal-600 transition-all relative focus:outline-none shadow-2xs cursor-pointer"
             title="Notifications"
             aria-label="View notifications"
           >
@@ -150,77 +149,115 @@ export function Header({ onToggleMobileMenu }) {
             )}
           </button>
 
-          {/* Notifications Dropdown Panel */}
+          {/* Notifications Dropdown Panel (Responsive: full width on mobile 320px, right-aligned with safe clearance on tablet 768px & desktop) */}
           {notificationDropdownOpen && (
-            <div className="absolute right-0 mt-2.5 w-[calc(100vw-2rem)] sm:w-96 max-w-sm bg-white dark:bg-[#131F37] border border-[#E2E8F0] dark:border-[#22385F] rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="fixed top-[4.75rem] left-3 right-3 sm:left-auto sm:right-4 md:right-8 sm:w-88 lg:w-96 max-w-[calc(100vw-2rem)] bg-white dark:bg-[#131F37] border border-[#E2E8F0] dark:border-[#22385F] rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
               <div className="px-4 sm:px-5 py-3 sm:py-3.5 border-b border-[#E2E8F0] dark:border-[#22385F] flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm font-bold text-[#0F172A] dark:text-white">
+                <div className="flex items-center space-x-2 min-w-0">
+                  <span className="text-sm font-bold text-[#0F172A] dark:text-white truncate">
                     Notifications
                   </span>
                   {unreadCount > 0 && (
-                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950/80 text-[#009688] dark:text-teal-400 border border-teal-200 dark:border-teal-800">
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950/80 text-[#009688] dark:text-teal-400 border border-teal-200 dark:border-teal-800 shrink-0">
                       {unreadCount} new
                     </span>
                   )}
                 </div>
-                {unreadCount > 0 && (
-                  <button
-                    type="button"
-                    onClick={markAllAsRead}
-                    className="text-xs font-semibold text-[#009688] dark:text-teal-400 hover:underline"
-                  >
-                    Mark all as read
-                  </button>
-                )}
+                <div className="flex items-center space-x-2.5 shrink-0">
+                  {unreadCount > 0 && (
+                    <button
+                      type="button"
+                      onClick={markAllNotificationsAsRead}
+                      className="text-xs font-semibold text-[#009688] dark:text-teal-400 hover:underline cursor-pointer"
+                    >
+                      Mark all as read
+                    </button>
+                  )}
+                  {notifications.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={clearAllNotifications}
+                      className="text-xs font-semibold text-slate-400 hover:text-rose-500 transition-colors cursor-pointer"
+                      title="Clear notifications"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
               </div>
 
-              <div className="divide-y divide-[#E2E8F0] dark:divide-[#1E3150] max-h-80 overflow-y-auto">
-                {notifications.map((item) => (
-                  <div
-                    key={item.id}
-                    className={`p-4 transition-colors flex items-start space-x-3 ${
-                      item.unread
-                        ? 'bg-teal-50/40 dark:bg-[#172745]'
-                        : 'hover:bg-slate-50 dark:hover:bg-[#172745]/50'
-                    }`}
-                  >
-                    <div className="mt-0.5 shrink-0">
-                      {item.type === 'offered' && (
-                        <div className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                        </div>
-                      )}
-                      {item.type === 'confirmed' && (
-                        <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                          </svg>
-                        </div>
-                      )}
-                      {item.type === 'cancelled' && (
-                        <div className="w-7 h-7 rounded-lg bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 flex items-center justify-center">
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </div>
-                      )}
+              <div className="divide-y divide-[#E2E8F0] dark:divide-[#1E3150] max-h-[min(380px,calc(100vh-6rem))] overflow-y-auto scrollbar-thin">
+                {notifications.length === 0 ? (
+                  <div className="py-8 px-4 text-center">
+                    <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto mb-2">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                      </svg>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs font-bold text-[#0F172A] dark:text-white">
-                        {item.title}
-                      </div>
-                      <div className="text-xs text-[#64748B] dark:text-slate-400 mt-0.5 leading-normal">
-                        {item.message}
-                      </div>
-                      <div className="text-[10px] text-slate-400 mt-1">
-                        {item.time}
-                      </div>
-                    </div>
+                    <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">No notifications</p>
+                    <p className="text-[11px] text-slate-400 mt-0.5">All actions will appear here in real time.</p>
                   </div>
-                ))}
+                ) : (
+                  notifications.map((item) => (
+                    <div
+                      key={item.id}
+                      className={`p-3.5 sm:p-4 transition-colors flex items-start space-x-3 ${
+                        item.unread
+                          ? 'bg-teal-50/40 dark:bg-[#172745]'
+                          : 'hover:bg-slate-50 dark:hover:bg-[#172745]/50'
+                      }`}
+                    >
+                      <div className="mt-0.5 shrink-0">
+                        {item.type === 'offered' && (
+                          <div className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                        )}
+                        {item.type === 'confirmed' && (
+                          <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+                        )}
+                        {item.type === 'cancelled' && (
+                          <div className="w-7 h-7 rounded-lg bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 flex items-center justify-center">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </div>
+                        )}
+                        {item.type === 'role' && (
+                          <div className="w-7 h-7 rounded-lg bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                          </div>
+                        )}
+                        {(!item.type || item.type === 'info') && (
+                          <div className="w-7 h-7 rounded-lg bg-teal-50 dark:bg-teal-950 text-[#009688] dark:text-teal-400 flex items-center justify-center">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-bold text-[#0F172A] dark:text-white truncate">
+                          {item.title}
+                        </div>
+                        <div className="text-xs text-[#64748B] dark:text-slate-400 mt-0.5 leading-normal break-words">
+                          {item.message}
+                        </div>
+                        <div className="text-[10px] text-slate-400 mt-1">
+                          {formatTimeAgo(item.createdAt, item.time)}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           )}

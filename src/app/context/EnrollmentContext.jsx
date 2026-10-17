@@ -117,15 +117,6 @@ export function EnrollmentProvider({ children }) {
     } catch {}
   }, []);
 
-  const updateProfile = useCallback((newProfile) => {
-    setOperator(prev => {
-      const updated = { ...prev, ...newProfile };
-      try {
-        window.localStorage.setItem('TED_OPERATOR', JSON.stringify(updated));
-      } catch {}
-      return updated;
-    });
-  }, []);
 
   // Core enrollment data initialized eagerly from localStorage (0 waterfall re-renders)
   const [people, setPeople] = useState(() => {
@@ -234,6 +225,95 @@ export function EnrollmentProvider({ children }) {
     setToasts(prev => prev.filter(t => t.id !== id));
   }, []);
 
+  // Bell Notifications List (reactive to all actions: create, delete, update role, etc.)
+  const [notifications, setNotifications] = useState(() => {
+    try {
+      const stored = window.localStorage.getItem('TED_NOTIFICATIONS');
+      if (stored) return JSON.parse(stored);
+    } catch {}
+    return [
+      {
+        id: 'notif-1',
+        title: 'Seat offered for React',
+        message: 'Waitlisted seat is now available for John Doe.',
+        time: '2m ago',
+        createdAt: Date.now() - 2 * 60 * 1000,
+        unread: true,
+        type: 'offered'
+      },
+      {
+        id: 'notif-2',
+        title: 'Enrollment confirmed',
+        message: 'John Doe confirmed for System Design.',
+        time: '10m ago',
+        createdAt: Date.now() - 10 * 60 * 1000,
+        unread: true,
+        type: 'confirmed'
+      },
+      {
+        id: 'notif-3',
+        title: 'Session cancelled',
+        message: 'Testing session seat vacated and processed.',
+        time: '1h ago',
+        createdAt: Date.now() - 60 * 60 * 1000,
+        unread: false,
+        type: 'cancelled'
+      }
+    ];
+  });
+
+  const addNotification = useCallback(({ title, message, type = 'info' }) => {
+    const id = `notif-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
+    const newNotif = {
+      id,
+      title,
+      message,
+      type,
+      time: 'Just now',
+      createdAt: Date.now(),
+      unread: true
+    };
+    setNotifications(prev => {
+      const updated = [newNotif, ...prev].slice(0, 30);
+      try {
+        window.localStorage.setItem('TED_NOTIFICATIONS', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  }, []);
+
+  const markAllNotificationsAsRead = useCallback(() => {
+    setNotifications(prev => {
+      const updated = prev.map(n => ({ ...n, unread: false }));
+      try {
+        window.localStorage.setItem('TED_NOTIFICATIONS', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  }, []);
+
+  const clearAllNotifications = useCallback(() => {
+    setNotifications([]);
+    try {
+      window.localStorage.setItem('TED_NOTIFICATIONS', JSON.stringify([]));
+    } catch {}
+  }, []);
+
+  const updateProfile = useCallback((newProfile) => {
+    setOperator(prev => {
+      const updated = { ...prev, ...newProfile };
+      try {
+        window.localStorage.setItem('TED_OPERATOR', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+    addNotification({
+      title: 'Profile & Role Updated',
+      message: `Role set to "${newProfile.role || 'Administrator'}" for ${newProfile.fullName || 'Operator'}.`,
+      type: 'role'
+    });
+  }, [addNotification]);
+
   // Synchronize state mutations to localStorage
   const persistState = useCallback((newPeople, newEnrollments) => {
     setPeople(newPeople);
@@ -291,8 +371,14 @@ export function EnrollmentProvider({ children }) {
       message: `${personInput.fullName || 'Participant'}: ${summary}`
     });
 
+    addNotification({
+      title: confCount > 0 ? 'Enrollment Confirmed' : 'Waitlist Registered',
+      message: `${personInput.fullName || 'Participant'}: ${summary}`,
+      type: confCount > 0 ? 'confirmed' : 'offered'
+    });
+
     return { success: true, result };
-  }, [people, enrollments, sessions, trainingDate, persistState, addToast]);
+  }, [people, enrollments, sessions, trainingDate, persistState, addToast, addNotification]);
 
   // Action: Cancel enrollment
   const handleCancelEnrollment = useCallback((enrollmentId) => {
@@ -327,8 +413,14 @@ export function EnrollmentProvider({ children }) {
       message
     });
 
+    addNotification({
+      title: 'Enrollment Cancelled',
+      message,
+      type: 'cancelled'
+    });
+
     return true;
-  }, [people, enrollments, sessions, trainingDate, persistState, addToast]);
+  }, [people, enrollments, sessions, trainingDate, persistState, addToast, addNotification]);
 
   // Action: Accept waitlist offer
   const handleAcceptOffer = useCallback((offerEnrollmentId) => {
@@ -358,8 +450,14 @@ export function EnrollmentProvider({ children }) {
       message: 'Waitlisted offer accepted and confirmed.'
     });
 
+    addNotification({
+      title: 'Waitlist Offer Confirmed',
+      message: 'Waitlisted offer accepted and confirmed.',
+      type: 'confirmed'
+    });
+
     return true;
-  }, [enrollments, people, sessions, trainingDate, persistState, addToast]);
+  }, [enrollments, people, sessions, trainingDate, persistState, addToast, addNotification]);
 
   // Action: Decline waitlist offer
   const handleDeclineOffer = useCallback((offerEnrollmentId) => {
@@ -392,8 +490,14 @@ export function EnrollmentProvider({ children }) {
       message: msg
     });
 
+    addNotification({
+      title: 'Waitlist Offer Declined',
+      message: msg,
+      type: 'cancelled'
+    });
+
     return true;
-  }, [enrollments, people, sessions, persistState, addToast]);
+  }, [enrollments, people, sessions, persistState, addToast, addNotification]);
 
   // Action: Reset development fixtures
   const handleResetData = useCallback(() => {
@@ -406,7 +510,13 @@ export function EnrollmentProvider({ children }) {
       title: 'Data Reset',
       message: 'Workspace restored to default training fixtures.'
     });
-  }, [addToast]);
+
+    addNotification({
+      title: 'Workspace Data Reset',
+      message: 'Workspace restored to default training fixtures.',
+      type: 'info'
+    });
+  }, [addToast, addNotification]);
 
   const value = useMemo(() => ({
     theme,
@@ -436,6 +546,10 @@ export function EnrollmentProvider({ children }) {
     toasts,
     addToast,
     removeToast,
+    notifications,
+    addNotification,
+    markAllNotificationsAsRead,
+    clearAllNotifications,
     handleEnroll,
     handleCancelEnrollment,
     handleAcceptOffer,
@@ -474,6 +588,10 @@ export function EnrollmentProvider({ children }) {
     toasts,
     addToast,
     removeToast,
+    notifications,
+    addNotification,
+    markAllNotificationsAsRead,
+    clearAllNotifications,
     handleEnroll,
     handleCancelEnrollment,
     handleAcceptOffer,

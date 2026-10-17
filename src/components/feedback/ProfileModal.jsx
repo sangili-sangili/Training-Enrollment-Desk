@@ -10,6 +10,7 @@ function ProfileModalContent() {
   const { operator, updateProfile, setProfileModalOpen, addToast } = useEnrollment();
   const [fullName, setFullName] = useState(operator.fullName || '');
   const [email, setEmail] = useState(operator.email || '');
+  const [role, setRole] = useState(operator.role || 'Senior Desk Administrator');
 
   useEffect(() => {
     function handleKeyDown(e) {
@@ -28,9 +29,13 @@ function ProfileModalContent() {
       return;
     }
 
-    updateProfile({ fullName: fullName.trim(), email: email.trim().toLowerCase() });
+    updateProfile({
+      fullName: fullName.trim(),
+      email: email.trim().toLowerCase(),
+      role: role.trim()
+    });
     setProfileModalOpen(false);
-    addToast({ type: 'success', title: 'Profile Updated', message: 'Your operator details have been saved.' });
+    addToast({ type: 'success', title: 'Profile Updated', message: 'Your operator details and role have been saved.' });
   };
 
   return (
@@ -48,7 +53,7 @@ function ProfileModalContent() {
               </svg>
             </div>
             <h3 className="text-base font-bold text-[#0F172A] dark:text-white">
-              Update Operator Profile
+              Update Operator Profile &amp; Role
             </h3>
           </div>
           <button
@@ -88,6 +93,22 @@ function ProfileModalContent() {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3.5 py-2 text-sm bg-white dark:bg-slate-800 border border-[#CBD5E1] dark:border-slate-700 rounded-lg text-[#0F172A] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#009688]"
             />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-[#0F172A] dark:text-slate-200 mb-1">
+              Operator Role
+            </label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="w-full px-3.5 py-2 text-sm bg-white dark:bg-slate-800 border border-[#CBD5E1] dark:border-slate-700 rounded-lg text-[#0F172A] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#009688] cursor-pointer"
+            >
+              <option value="Senior Desk Administrator">Senior Desk Administrator</option>
+              <option value="Desk Administrator">Desk Administrator</option>
+              <option value="Training Coordinator">Training Coordinator</option>
+              <option value="Registrar / Auditor">Registrar / Auditor</option>
+            </select>
           </div>
 
           <div className="pt-2 flex items-center justify-end space-x-3">
