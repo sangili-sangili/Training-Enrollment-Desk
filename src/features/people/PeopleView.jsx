@@ -136,10 +136,14 @@ export function PeopleView() {
   }, [setActiveTab, setPrefilledTrainee]);
 
   const handleViewPriceBreakdown = useCallback((enrollment, person, session) => {
+    const targetSessionDate = (enrollment.sessionDate && enrollment.sessionDate !== 'ALL')
+      ? enrollment.sessionDate
+      : (trainingDate && trainingDate !== 'ALL' ? trainingDate : '2026-11-10');
+
     const breakdown = calculatePriceBreakdown({
       sessionId: enrollment.sessionId,
-      referenceDate: enrollment.enrolledAt,
-      sessionDate: enrollment.sessionDate || trainingDate || '2025-04-28',
+      referenceDate: enrollment.confirmedAt || enrollment.enrolledAt,
+      sessionDate: targetSessionDate,
       company: person?.company || '',
       status: enrollment.status,
       enrollments,

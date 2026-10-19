@@ -25,16 +25,43 @@ export function PriceBreakdownModal() {
 
   const { enrollment, person, session, breakdown } = priceModalData;
 
-  const originalPrice = breakdown?.originalPrice ?? session?.basePrice ?? 0;
-  const finalPrice = breakdown?.finalPrice ?? enrollment?.finalPrice ?? originalPrice;
-  const discountAmount = breakdown?.discountAmount ?? (originalPrice - finalPrice);
-  const discountPercent = breakdown?.discountPercent ?? 0;
-  const appliedDiscount = breakdown?.appliedDiscount || 'NONE';
-  const discountReason = breakdown?.discountReason || '';
+  const originalPrice = breakdown?.originalPrice ?? enrollment?.originalPrice ?? session?.basePrice ?? 0;
+  
+  // Prefer breakdown discount if valid, otherwise fall back to the enrollment record's persisted discount
+  const hasBreakdownDiscount = breakdown?.appliedDiscount && breakdown.appliedDiscount !== 'NONE';
+  const hasEnrollmentDiscount = enrollment?.appliedDiscount && enrollment.appliedDiscount !== 'NONE';
+
+  const appliedDiscount = hasBreakdownDiscount
+    ? breakdown.appliedDiscount
+    : (hasEnrollmentDiscount ? enrollment.appliedDiscount : 'NONE');
+
+  const discountPercent = hasBreakdownDiscount
+    ? (breakdown.discountPercent || 0)
+    : (hasEnrollmentDiscount ? (enrollment.discountPercent || (appliedDiscount === 'EARLY_BIRD' ? 15 : appliedDiscount === 'COMPANY' ? 10 : 0)) : 0);
+
+  const discountAmount = hasBreakdownDiscount
+    ? (breakdown.discountAmount || 0)
+    : (hasEnrollmentDiscount
+        ? (enrollment.discountAmount ?? (originalPrice - (enrollment.finalPrice ?? originalPrice)))
+        : 0);
 
   const isWaitlisted = enrollment?.status === 'Waitlisted';
   const isCancelled = enrollment?.status === 'Cancelled';
   const isOffered = enrollment?.status === 'Offered';
+
+  const finalPrice = isWaitlisted
+    ? 0
+    : (hasBreakdownDiscount
+        ? breakdown.finalPrice
+        : (enrollment?.finalPrice ?? (originalPrice - discountAmount)));
+
+  const discountReason = (hasBreakdownDiscount && breakdown?.discountReason)
+    ? breakdown.discountReason
+    : (enrollment?.notes || (appliedDiscount === 'EARLY_BIRD'
+        ? 'Early Bird 15% discount (enrolled >= 7 days before session)'
+        : appliedDiscount === 'COMPANY'
+        ? 'Company 10% group discount (3+ unique confirmed employees)'
+        : 'Standard base tuition fee'));
 
   return (
     <div
