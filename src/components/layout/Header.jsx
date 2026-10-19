@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useEnrollment } from '../../app/context/useEnrollment.js';
 import { ROUTES } from '../../app/routes.js';
 import { getInitials } from '../../utils/formatters.js';
@@ -25,6 +25,18 @@ const TITLE_MAP = {
     subtitle: 'Persistence controls and workspace configuration'
   }
 };
+
+function formatTimeAgo(createdAt, fallback) {
+  if (!createdAt) return fallback || 'Recently';
+  const diffSec = Math.floor((Date.now() - createdAt) / 1000);
+  if (diffSec < 60) return 'Just now';
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHour = Math.floor(diffMin / 60);
+  if (diffHour < 24) return `${diffHour}h ago`;
+  const diffDay = Math.floor(diffHour / 24);
+  return `${diffDay}d ago`;
+}
 
 /**
  * Top Application Header
@@ -68,18 +80,6 @@ export function Header({ onToggleMobileMenu }) {
   }, []);
 
   const unreadCount = useMemo(() => (notifications || []).filter(n => n.unread).length, [notifications]);
-
-  const formatTimeAgo = (createdAt, fallback) => {
-    if (!createdAt) return fallback || 'Recently';
-    const diffSec = Math.floor((Date.now() - createdAt) / 1000);
-    if (diffSec < 60) return 'Just now';
-    const diffMin = Math.floor(diffSec / 60);
-    if (diffMin < 60) return `${diffMin}m ago`;
-    const diffHour = Math.floor(diffMin / 60);
-    if (diffHour < 24) return `${diffHour}h ago`;
-    const diffDay = Math.floor(diffHour / 24);
-    return `${diffDay}d ago`;
-  };
 
   const currentHeader = TITLE_MAP[activeTab] || TITLE_MAP[ROUTES.DASHBOARD];
 
