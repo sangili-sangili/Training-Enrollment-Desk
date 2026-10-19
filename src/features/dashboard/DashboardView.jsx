@@ -63,12 +63,12 @@ export function DashboardView() {
         </div>
 
         {/* Training Date Filter dropdown matching Figma design */}
-        <div className="flex items-center space-x-3 self-start sm:self-auto" ref={dropdownRef}>
+        <div className="flex items-center space-x-3 self-start sm:self-auto relative" ref={dropdownRef}>
           <span className="text-xs sm:text-sm font-semibold text-[#475569] dark:text-slate-300 select-none">
             Training Date
           </span>
 
-          <div className="relative">
+          <div>
             <button
               type="button"
               onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -90,70 +90,70 @@ export function DashboardView() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
-
-            {/* Dropdown Panel */}
-            {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] bg-white dark:bg-[#131F37] border border-[#E2E8F0] dark:border-[#22385F] rounded-2xl shadow-xl z-50 p-4 animate-in fade-in zoom-in-95 duration-150">
-                <div className="text-xs font-bold text-[#0F172A] dark:text-white mb-2">
-                  Select Cohort Date
-                </div>
-
-                {/* Preset Options */}
-                <div className="space-y-1 mb-4">
-                  <button
-                    type="button"
-                    onClick={() => handleSelectPreset('2025-04-28')}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
-                      trainingDate === '2025-04-28'
-                        ? 'bg-teal-50 dark:bg-teal-950/70 text-[#009688] dark:text-teal-400 border border-teal-200 dark:border-teal-800'
-                        : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#1A2949]'
-                    }`}
-                  >
-                    <span>Apr 28, 2025</span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-sm bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-300">
-                      Active
-                    </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleSelectPreset('ALL')}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
-                      trainingDate === 'ALL'
-                        ? 'bg-teal-50 dark:bg-teal-950/70 text-[#009688] dark:text-teal-400 border border-teal-200 dark:border-teal-800'
-                        : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#1A2949]'
-                    }`}
-                  >
-                    <span>All Cohort Dates</span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-sm bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300">
-                      Combined
-                    </span>
-                  </button>
-                </div>
-
-                {/* Custom Date Input */}
-                <form onSubmit={handleApplyCustomDate} className="pt-3 border-t border-[#E2E8F0] dark:border-[#1E3150] space-y-2">
-                  <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                    Or pick any calendar date:
-                  </label>
-                  <div className="flex space-x-2">
-                    <input
-                      type="date"
-                      value={customDateInput}
-                      onChange={(e) => setCustomDateInput(e.target.value)}
-                      className="flex-1 px-2.5 py-1.5 text-xs bg-slate-50 dark:bg-[#1A2949] border border-[#E2E8F0] dark:border-[#22385F] rounded-lg text-[#0F172A] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#009688]"
-                    />
-                    <button
-                      type="submit"
-                      className="px-3 py-1.5 text-xs font-bold text-white bg-[#009688] hover:bg-[#007F76] rounded-lg transition-colors cursor-pointer shrink-0"
-                    >
-                      Apply
-                    </button>
-                  </div>
-                </form>
-              </div>
-            )}
           </div>
+
+          {/* Dropdown Panel */}
+          {dropdownOpen && (
+            <div className="absolute left-0 sm:left-auto sm:right-0 top-full mt-2 w-72 max-w-[calc(100vw-2rem)] bg-white dark:bg-[#131F37] border border-[#E2E8F0] dark:border-[#22385F] rounded-2xl shadow-xl z-50 p-4 animate-in fade-in zoom-in-95 duration-150">
+              <div className="text-xs font-bold text-[#0F172A] dark:text-white mb-2">
+                Select Cohort Date
+              </div>
+
+              {/* Preset Options */}
+              <div className="space-y-1 mb-4">
+                <button
+                  type="button"
+                  onClick={() => handleSelectPreset('2025-04-28')}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                    trainingDate === '2025-04-28'
+                      ? 'bg-teal-50 dark:bg-teal-950/70 text-[#009688] dark:text-teal-400 border border-teal-200 dark:border-teal-800'
+                      : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#1A2949]'
+                  }`}
+                >
+                  <span>Apr 28, 2025</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-sm bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-300">
+                    Active
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleSelectPreset('ALL')}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                    trainingDate === 'ALL'
+                      ? 'bg-teal-50 dark:bg-teal-950/70 text-[#009688] dark:text-teal-400 border border-teal-200 dark:border-teal-800'
+                      : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#1A2949]'
+                  }`}
+                >
+                  <span>All Cohort Dates</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-sm bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300">
+                    Combined
+                  </span>
+                </button>
+              </div>
+
+              {/* Custom Date Input */}
+              <form onSubmit={handleApplyCustomDate} className="pt-3 border-t border-[#E2E8F0] dark:border-[#1E3150] space-y-2">
+                <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                  Or pick any calendar date:
+                </label>
+                <div className="flex space-x-2">
+                  <input
+                    type="date"
+                    value={customDateInput}
+                    onChange={(e) => setCustomDateInput(e.target.value)}
+                    className="flex-1 min-w-0 px-2.5 py-1.5 text-xs bg-slate-50 dark:bg-[#1A2949] border border-[#E2E8F0] dark:border-[#22385F] rounded-lg text-[#0F172A] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#009688]"
+                  />
+                  <button
+                    type="submit"
+                    className="px-3 py-1.5 text-xs font-bold text-white bg-[#009688] hover:bg-[#007F76] rounded-lg transition-colors cursor-pointer shrink-0"
+                  >
+                    Apply
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
         </div>
       </div>
 
