@@ -126,7 +126,7 @@ export function SessionsView() {
   const handleViewPrice = useCallback((enrollment, person, session) => {
     const targetSessionDate = (enrollment.sessionDate && enrollment.sessionDate !== 'ALL')
       ? enrollment.sessionDate
-      : (trainingDate && trainingDate !== 'ALL' ? trainingDate : '2026-11-10');
+      : (trainingDate && trainingDate !== 'ALL' ? trainingDate : '2025-04-28');
 
     const breakdown = calculatePriceBreakdown({
       sessionId: enrollment.sessionId,

@@ -21,7 +21,8 @@ export function getWaitlistedCandidatesForSession(sessionId, enrollments = []) {
  * @param {{
  *   sessionId: string,
  *   enrollments: Array<object>,
- *   sessions?: Array<object>
+ *   sessions?: Array<object>,
+ *   sessionDate?: string|Date|null
  * }} params
  * @returns {{
  *   candidate: object|null,
@@ -31,13 +32,21 @@ export function getWaitlistedCandidatesForSession(sessionId, enrollments = []) {
 export function findOldestEligibleWaitlistCandidate({
   sessionId,
   enrollments = [],
-  sessions = []
+  sessions = [],
+  sessionDate = null
 }) {
   const queue = getWaitlistedCandidatesForSession(sessionId, enrollments);
   const skipped = [];
 
   for (const candidate of queue) {
-    const conflictCheck = checkPersonScheduleConflict(sessionId, candidate.personId, enrollments, sessions);
+    const candidateDate = sessionDate || candidate.sessionDate || '2025-04-28';
+    const conflictCheck = checkPersonScheduleConflict(
+      sessionId,
+      candidate.personId,
+      enrollments,
+      sessions,
+      candidateDate
+    );
     if (conflictCheck.hasConflict) {
       skipped.push({
         candidate,

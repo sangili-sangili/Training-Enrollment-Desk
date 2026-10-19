@@ -180,16 +180,12 @@ export function EnrollmentProvider({ children }) {
     if (trainingDate === 'ALL') {
       return enrollments;
     }
-    // Match Figma baseline date ('2025-04-28') or standard cohort ('2026-11-10') or explicit matching sessionDate
-    if (trainingDate === '2025-04-28' || trainingDate === '2026-11-10') {
-      return enrollments.filter(e => !e.sessionDate || e.sessionDate === trainingDate || e.sessionDate === '2026-11-10' || e.sessionDate === '2025-04-28');
-    }
-    return enrollments.filter(e => e.sessionDate === trainingDate);
+    return enrollments.filter(e => (e.sessionDate || '2025-04-28') === trainingDate);
   }, [enrollments, trainingDate]);
 
   // Derived unique people filtered by active enrollments
   const activePeople = useMemo(() => {
-    if (trainingDate === 'ALL' || trainingDate === '2025-04-28' || trainingDate === '2026-11-10') {
+    if (trainingDate === 'ALL') {
       return people;
     }
     const personIds = new Set(activeEnrollments.map(e => e.personId));
@@ -382,12 +378,14 @@ export function EnrollmentProvider({ children }) {
 
   // Action: Cancel enrollment
   const handleCancelEnrollment = useCallback((enrollmentId) => {
+    const targetEnr = enrollments.find(e => e.id === enrollmentId);
+    const resolvedDate = targetEnr?.sessionDate || (trainingDate !== 'ALL' ? trainingDate : '2025-04-28');
     const result = cancelEnrollment({
       enrollmentId,
       people,
       enrollments,
       sessions,
-      sessionDate: trainingDate,
+      sessionDate: resolvedDate,
       nowIso: new Date().toISOString()
     });
 
@@ -424,12 +422,14 @@ export function EnrollmentProvider({ children }) {
 
   // Action: Accept waitlist offer
   const handleAcceptOffer = useCallback((offerEnrollmentId) => {
+    const targetEnr = enrollments.find(e => e.id === offerEnrollmentId);
+    const resolvedDate = targetEnr?.sessionDate || (trainingDate !== 'ALL' ? trainingDate : '2025-04-28');
     const result = acceptSeatOffer({
       offerEnrollmentId,
       enrollments,
       people,
       sessions,
-      sessionDate: trainingDate,
+      sessionDate: resolvedDate,
       confirmationDate: new Date().toISOString()
     });
 

@@ -54,7 +54,7 @@ const SESSION_ICONS = {
  * Matches Figma design with square icons for each training session
  */
 export function UpcomingSessionsList() {
-  const { enrollments, activeEnrollments, sessions, setActiveTab, setSelectedSessionFilter, trainingDate } = useEnrollment();
+  const { enrollments, activeEnrollments, sessions, setActiveTab, setSelectedSessionFilter } = useEnrollment();
   const currentEnrollments = activeEnrollments ?? enrollments;
 
   // Memoize occupancy map calculation
@@ -107,17 +107,24 @@ export function UpcomingSessionsList() {
               availableSeats: session.capacity,
               capacity: session.capacity
             };
-            const displayedOccupied = (trainingDate === '2025-04-28' && session.id === 'SES-SYSDES' && occupancy.occupiedSeats === 3)
-              ? 2
-              : occupancy.occupiedSeats;
-            const status = displayedOccupied === 0 ? 'Upcoming' : (SESSION_STATUS[session.id] || 'Upcoming');
+            const occupiedSeats = occupancy.occupiedSeats;
+            const status = occupiedSeats === 0 ? 'Upcoming' : (SESSION_STATUS[session.id] || 'Upcoming');
             const icon = SESSION_ICONS[session.id];
 
             return (
               <div
                 key={session.id}
+                role="button"
+                tabIndex={0}
+                aria-label={`Filter sessions by ${session.title}, ${occupiedSeats} of ${session.capacity} seats occupied`}
                 onClick={() => handleInspectSession(session.id)}
-                className="group p-3 sm:p-3.5 rounded-xl border border-[#E2E8F0] dark:border-[#1E3150] hover:border-[#009688] dark:hover:border-teal-500 hover:bg-teal-50/20 dark:hover:bg-teal-950/30 transition-all cursor-pointer flex items-center justify-between gap-2.5 sm:gap-4"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleInspectSession(session.id);
+                  }
+                }}
+                className="group p-3 sm:p-3.5 rounded-xl border border-[#E2E8F0] dark:border-[#1E3150] hover:border-[#009688] dark:hover:border-teal-500 hover:bg-teal-50/20 dark:hover:bg-teal-950/30 transition-all cursor-pointer flex items-center justify-between gap-2.5 sm:gap-4 focus:outline-none focus:ring-2 focus:ring-[#009688]"
               >
                 <div className="flex items-center space-x-3 sm:space-x-3.5 min-w-0 flex-1">
                   <div className="shrink-0">
@@ -141,7 +148,7 @@ export function UpcomingSessionsList() {
                   </Badge>
                   <div className="text-right sm:min-w-12">
                     <span className="text-xs font-extrabold text-[#0F172A] dark:text-white">
-                      {displayedOccupied}/{session.capacity}
+                      {occupiedSeats}/{session.capacity}
                     </span>
                     <span className="text-[10px] text-slate-400 font-medium ml-1 sm:block sm:ml-0">
                       seats

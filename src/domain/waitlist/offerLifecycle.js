@@ -38,7 +38,8 @@ export function createSeatOffer({
     return { success: false, updatedEnrollments: enrollments, offeredEnrollment: null, error: 'No available capacity in session to reserve an offer.' };
   }
 
-  const conflictCheck = checkPersonScheduleConflict(candidate.sessionId, candidate.personId, enrollments, sessions);
+  const candidateDate = candidate.sessionDate || '2025-04-28';
+  const conflictCheck = checkPersonScheduleConflict(candidate.sessionId, candidate.personId, enrollments, sessions, candidateDate);
   if (conflictCheck.hasConflict) {
     return {
       success: false,
@@ -78,7 +79,7 @@ export function createSeatOffer({
  *   enrollments: Array<object>,
  *   people: Array<object>,
  *   sessions?: Array<object>,
- *   sessionDate: string|Date,
+ *   sessionDate?: string|Date,
  *   confirmationDate?: string|Date
  * }} params
  * @returns {{
@@ -105,8 +106,10 @@ export function acceptSeatOffer({
     return { success: false, updatedEnrollments: enrollments, confirmedEnrollment: null, error: `Cannot accept offer for enrollment in status "${offer.status}".` };
   }
 
+  const offerDate = offer.sessionDate || sessionDate || '2025-04-28';
+
   // Revalidate conflict
-  const conflictCheck = checkPersonScheduleConflict(offer.sessionId, offer.personId, enrollments, sessions);
+  const conflictCheck = checkPersonScheduleConflict(offer.sessionId, offer.personId, enrollments, sessions, offerDate);
   if (conflictCheck.hasConflict) {
     return {
       success: false,
@@ -123,11 +126,12 @@ export function acceptSeatOffer({
   const pricing = calculatePriceBreakdown({
     sessionId: offer.sessionId,
     referenceDate: confirmationDate,
-    sessionDate,
+    sessionDate: offerDate,
     company,
     status: 'Confirmed',
     enrollments,
     people,
+    sessions,
     candidatePersonId: offer.personId,
     isCandidateBeingConfirmed: true
   });
@@ -154,9 +158,10 @@ export function acceptSeatOffer({
     updatedEnrollments = recalculateCompanyEnrollmentPrices({
       company,
       sessionId: offer.sessionId,
-      sessionDate,
+      sessionDate: offerDate,
       enrollments: updatedEnrollments,
-      people
+      people,
+      sessions
     });
   }
 

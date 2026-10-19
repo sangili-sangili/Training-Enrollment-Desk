@@ -43,14 +43,18 @@ function EnrollWorkflow({
     return people.find(p => normalizeEmail(p.email) === normEmail) || null;
   }, [people, normEmail]);
 
-  // Existing confirmed session IDs for this participant
+  // Existing confirmed session IDs for this participant (scoped to target cohort date)
   const candidateConfirmedSessionIds = useMemo(() => {
     if (!existingPerson) return new Set();
     const confirmed = enrollments
-      .filter(e => e.personId === existingPerson.id && (e.status === 'Confirmed' || e.status === 'Offered'))
+      .filter(e =>
+        e.personId === existingPerson.id &&
+        (e.status === 'Confirmed' || e.status === 'Offered') &&
+        (!cohortDate || cohortDate === 'ALL' || (e.sessionDate || '2025-04-28') === cohortDate)
+      )
       .map(e => e.sessionId);
     return new Set(confirmed);
-  }, [existingPerson, enrollments]);
+  }, [existingPerson, enrollments, cohortDate]);
 
   const priorEnrollmentCount = candidateConfirmedSessionIds.size;
 
@@ -63,12 +67,12 @@ function EnrollWorkflow({
     // 2. Check conflict against existing confirmed seats for this participant
     if (existingPerson) {
       for (const selId of selectedSessionIds) {
-        const check = checkPersonScheduleConflict(selId, existingPerson.id, enrollments, sessions);
+        const check = checkPersonScheduleConflict(selId, existingPerson.id, enrollments, sessions, cohortDate);
         if (check.hasConflict) return true;
       }
     }
     return false;
-  }, [selectedSessionIds, sessions, existingPerson, enrollments]);
+  }, [selectedSessionIds, sessions, existingPerson, enrollments, cohortDate]);
 
   // Handle form field change with auto-fill for returning participants
   const handleFieldChange = useCallback((field, value) => {
@@ -273,13 +277,7 @@ export function EnrollView() {
     if (!cohortDate || cohortDate === 'ALL') {
       return enrollments;
     }
-    // Baseline fixtures date matches unassigned seed records
-    if (cohortDate === '2025-04-28' || cohortDate === '2026-11-10') {
-      return enrollments.filter(
-        e => !e.sessionDate || e.sessionDate === cohortDate || e.sessionDate === '2025-04-28' || e.sessionDate === '2026-11-10'
-      );
-    }
-    return enrollments.filter(e => e.sessionDate === cohortDate);
+    return enrollments.filter(e => (e.sessionDate || '2025-04-28') === cohortDate);
   }, [enrollments, cohortDate]);
 
   const occupancyMap = useMemo(

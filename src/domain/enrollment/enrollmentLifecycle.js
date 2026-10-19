@@ -120,6 +120,10 @@ export function createEnrollments({
   }
 
   // 3. Pre-validate all requested sessions for duplicates and conflicts (Atomic Transaction)
+  const resolvedSessionDate = (typeof sessionDate === 'string' && sessionDate !== 'ALL')
+    ? sessionDate
+    : (sessionDate instanceof Date ? sessionDate.toISOString().split('T')[0] : '2025-04-28');
+
   const conflicts = [];
   const errors = [];
 
@@ -127,6 +131,7 @@ export function createEnrollments({
     const existingSameSession = enrollments.find(e =>
       e.personId === person.id &&
       e.sessionId === sessionId &&
+      (e.sessionDate || '2025-04-28') === resolvedSessionDate &&
       e.status !== 'Cancelled'
     );
 
@@ -134,7 +139,7 @@ export function createEnrollments({
       errors.push(`Participant is already ${existingSameSession.status.toLowerCase()} in this session.`);
     }
 
-    const conflictCheck = checkPersonScheduleConflict(sessionId, person.id, enrollments, sessions);
+    const conflictCheck = checkPersonScheduleConflict(sessionId, person.id, enrollments, sessions, resolvedSessionDate);
     if (conflictCheck.hasConflict) {
       conflicts.push({
         sessionId,
@@ -158,10 +163,6 @@ export function createEnrollments({
   }
 
   // 4. All sessions are valid; proceed with enrollment allocation
-  const resolvedSessionDate = (typeof sessionDate === 'string' && sessionDate !== 'ALL')
-    ? sessionDate
-    : (sessionDate instanceof Date ? sessionDate.toISOString().split('T')[0] : '2025-04-28');
-
   let updatedEnrollments = [...enrollments];
   const newlyConfirmed = [];
   const newlyWaitlisted = [];
@@ -175,7 +176,7 @@ export function createEnrollments({
       const pricing = calculatePriceBreakdown({
         sessionId,
         referenceDate: nowIso,
-        sessionDate,
+        sessionDate: resolvedSessionDate,
         company: person.company,
         status: 'Confirmed',
         enrollments: updatedEnrollments,
@@ -210,9 +211,10 @@ export function createEnrollments({
         updatedEnrollments = recalculateCompanyEnrollmentPrices({
           company: person.company,
           sessionId,
-          sessionDate,
+          sessionDate: resolvedSessionDate,
           enrollments: updatedEnrollments,
-          people: updatedPeople
+          people: updatedPeople,
+          sessions
         });
       }
     } else {
@@ -220,7 +222,7 @@ export function createEnrollments({
       const baseBreakdown = calculatePriceBreakdown({
         sessionId,
         referenceDate: nowIso,
-        sessionDate,
+        sessionDate: resolvedSessionDate,
         company: person.company,
         status: 'Waitlisted'
       });
@@ -315,14 +317,17 @@ export function cancelEnrollment({
   let promotedOffer = null;
 
   if (wasConfirmed) {
+    const cancelDate = target.sessionDate || sessionDate || '2025-04-28';
+
     // 1. Recalculate company discounts for remaining employees (in case count dropped below 3)
     if (person && person.company) {
       updatedEnrollments = recalculateCompanyEnrollmentPrices({
         company: person.company,
         sessionId: target.sessionId,
-        sessionDate,
+        sessionDate: cancelDate,
         enrollments: updatedEnrollments,
-        people
+        people,
+        sessions
       });
     }
 
@@ -330,7 +335,8 @@ export function cancelEnrollment({
     const nextWaitlist = findOldestEligibleWaitlistCandidate({
       sessionId: target.sessionId,
       enrollments: updatedEnrollments,
-      sessions
+      sessions,
+      sessionDate: cancelDate
     });
 
     if (nextWaitlist.candidate) {

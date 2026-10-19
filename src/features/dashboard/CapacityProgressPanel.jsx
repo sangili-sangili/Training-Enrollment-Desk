@@ -54,7 +54,7 @@ const SESSION_STYLES = {
  * Matches Figma design with exact icons, counts, and prominent animated striped progress bars
  */
 export function CapacityProgressPanel() {
-  const { enrollments, activeEnrollments, sessions, setActiveTab, trainingDate } = useEnrollment();
+  const { enrollments, activeEnrollments, sessions, setActiveTab } = useEnrollment();
   const currentEnrollments = activeEnrollments ?? enrollments;
 
   // Memoize occupancy map computation to avoid recalculation on unrelated renders
@@ -102,14 +102,11 @@ export function CapacityProgressPanel() {
               availableSeats: session.capacity,
               capacity: session.capacity
             };
-            // In Figma mockup for 'Apr 28, 2025', System Design displays 2 / 4 (2 left)
-            const displayedOccupied = (trainingDate === '2025-04-28' && session.id === 'SES-SYSDES' && occupancy.occupiedSeats === 3)
-              ? 2
-              : occupancy.occupiedSeats;
-            const displayedAvailable = Math.max(0, session.capacity - displayedOccupied);
-            const percentage = displayedOccupied === 0
+            const occupiedSeats = occupancy.occupiedSeats;
+            const availableSeats = occupancy.availableSeats;
+            const percentage = session.capacity === 0
               ? 0
-              : Math.min(100, Math.round((displayedOccupied / session.capacity) * 100));
+              : Math.min(100, Math.round((occupiedSeats / session.capacity) * 100));
             const style = SESSION_STYLES[session.id] || SESSION_STYLES['SES-HTML'];
 
             return (
@@ -133,10 +130,10 @@ export function CapacityProgressPanel() {
 
                   <div className="text-right shrink-0">
                     <span className="text-xs sm:text-sm font-extrabold text-[#0F172A] dark:text-white whitespace-nowrap">
-                      {displayedOccupied} / {session.capacity}
+                      {occupiedSeats} / {session.capacity}
                     </span>
                     <span className="text-[10px] sm:text-xs text-[#94A3B8] dark:text-slate-400 ml-1 sm:ml-1.5 font-medium whitespace-nowrap block xs:inline">
-                      ({displayedAvailable} left)
+                      ({availableSeats} left)
                     </span>
                   </div>
                 </div>
@@ -150,6 +147,7 @@ export function CapacityProgressPanel() {
                       backgroundColor: '#009688'
                     }}
                     role="progressbar"
+                    aria-label={`${session.title} capacity: ${occupiedSeats} of ${session.capacity} seats occupied (${percentage}%)`}
                     aria-valuenow={percentage}
                     aria-valuemin="0"
                     aria-valuemax="100"

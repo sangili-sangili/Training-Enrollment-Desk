@@ -36,20 +36,39 @@ export function sessionsOverlap(sessionA, sessionB) {
  * @param {string} personId
  * @param {Array<object>} enrollments
  * @param {Array<object>} [sessions]
+ * @param {string|Date|null} [sessionDate]
  * @returns {{ hasConflict: boolean, conflictingSession: object|null, conflictingEnrollment: object|null }}
  */
-export function checkPersonScheduleConflict(targetSessionId, personId, enrollments = [], sessions = []) {
+export function checkPersonScheduleConflict(
+  targetSessionId,
+  personId,
+  enrollments = [],
+  sessions = [],
+  sessionDate = null
+) {
   const targetSession = sessions.find(s => s.id === targetSessionId) || getSessionById(targetSessionId);
   if (!targetSession) {
     return { hasConflict: false, conflictingSession: null, conflictingEnrollment: null };
   }
 
-  // Active seats held by this person: Confirmed or Offered
-  const activeEnrollments = enrollments.filter(e =>
-    e.personId === personId &&
-    (e.status === 'Confirmed' || e.status === 'Offered') &&
-    e.sessionId !== targetSessionId
-  );
+  const dateFilterStr = typeof sessionDate === 'string' && sessionDate !== 'ALL'
+    ? sessionDate
+    : (sessionDate instanceof Date ? sessionDate.toISOString().split('T')[0] : null);
+
+  // Active seats held by this person: Confirmed or Offered on the same sessionDate
+  const activeEnrollments = enrollments.filter(e => {
+    if (e.personId !== personId) return false;
+    if (e.status !== 'Confirmed' && e.status !== 'Offered') return false;
+    if (e.sessionId === targetSessionId) return false;
+
+    // If date is specified, restrict collision checks to that date
+    if (dateFilterStr) {
+      const enrDate = e.sessionDate || '2025-04-28';
+      if (enrDate !== dateFilterStr) return false;
+    }
+
+    return true;
+  });
 
   for (const enr of activeEnrollments) {
     const existingSession = sessions.find(s => s.id === enr.sessionId) || getSessionById(enr.sessionId);

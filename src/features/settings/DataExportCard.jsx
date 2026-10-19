@@ -82,8 +82,13 @@ export function DataExportCard() {
       const rows = enrollments.map(e => {
         const person = peopleMap.get(e.personId) || {};
         const session = sessionsMap.get(e.sessionId) || {};
-        const finalPrice = e.status === 'Confirmed' ? (e.finalPrice ?? session.basePrice ?? 0) : 0;
-        const discountName = e.status === 'Confirmed' ? (e.discountType || 'Standard Rate') : 'N/A (Waitlisted)';
+        const discountName = e.status === 'Confirmed'
+          ? (e.appliedDiscount === 'EARLY_BIRD'
+              ? 'Early Bird (15%)'
+              : e.appliedDiscount === 'COMPANY'
+              ? 'Company Group (10%)'
+              : (e.notes || 'Standard Rate'))
+          : 'N/A (Waitlisted)';
 
         return [
           e.id,

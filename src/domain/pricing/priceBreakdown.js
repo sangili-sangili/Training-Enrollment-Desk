@@ -33,10 +33,11 @@ export function calculatePriceBreakdown({
   status = 'Confirmed',
   enrollments = [],
   people = [],
+  sessions = [],
   candidatePersonId = null,
   isCandidateBeingConfirmed = false
 }) {
-  const session = getSessionById(sessionId);
+  const session = sessions.find(s => s.id === sessionId) || getSessionById(sessionId);
   const basePrice = session ? session.basePrice : 0;
 
   // Unconfirmed / waitlisted applicants are not charged
@@ -57,6 +58,7 @@ export function calculatePriceBreakdown({
     sessionId,
     enrollments,
     people,
+    sessionDate,
     candidatePersonId,
     isCandidateBeingConfirmed
   });
@@ -113,14 +115,24 @@ export function recalculateCompanyEnrollmentPrices({
   sessionId,
   sessionDate,
   enrollments = [],
-  people = []
+  people = [],
+  sessions = []
 }) {
   const normTargetCompany = normalizeCompany(company);
   if (!normTargetCompany) return enrollments;
 
+  const dateFilterStr = typeof sessionDate === 'string' && sessionDate !== 'ALL'
+    ? sessionDate
+    : (sessionDate instanceof Date ? sessionDate.toISOString().split('T')[0] : null);
+
   return enrollments.map(enr => {
     if (enr.sessionId !== sessionId || enr.status !== 'Confirmed') {
       return enr;
+    }
+
+    if (dateFilterStr) {
+      const enrDate = enr.sessionDate || '2025-04-28';
+      if (enrDate !== dateFilterStr) return enr;
     }
 
     const person = people.find(p => p.id === enr.personId);
@@ -130,14 +142,16 @@ export function recalculateCompanyEnrollmentPrices({
 
     // Determine reference date: use confirmedAt if available, else enrolledAt
     const refDate = enr.confirmedAt || enr.enrolledAt;
+    const targetSessionDate = enr.sessionDate || sessionDate || '2025-04-28';
     const newPricing = calculatePriceBreakdown({
       sessionId,
       referenceDate: refDate,
-      sessionDate,
+      sessionDate: targetSessionDate,
       company: person.company,
       status: 'Confirmed',
       enrollments,
-      people
+      people,
+      sessions
     });
 
     return {

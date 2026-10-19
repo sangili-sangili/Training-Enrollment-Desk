@@ -137,12 +137,23 @@ export function SessionChecklist({
           return (
             <div
               key={session.id}
+              role="checkbox"
+              aria-checked={isSelected}
+              aria-disabled={isAlreadyConfirmed}
+              tabIndex={isAlreadyConfirmed ? -1 : 0}
+              aria-label={`${session.title}, ₹${session.basePrice}, ${occupancy.availableSeats > 0 ? `${occupancy.availableSeats} seats left` : 'Waitlist only'}`}
               onClick={() => {
                 if (!isAlreadyConfirmed) {
                   onToggleSession(session.id);
                 }
               }}
-              className={`relative rounded-2xl p-4.5 border transition-all cursor-pointer flex flex-col justify-between select-none ${
+              onKeyDown={(e) => {
+                if ((e.key === ' ' || e.key === 'Enter') && !isAlreadyConfirmed) {
+                  e.preventDefault();
+                  onToggleSession(session.id);
+                }
+              }}
+              className={`relative rounded-2xl p-4.5 border transition-all cursor-pointer flex flex-col justify-between select-none focus:outline-none focus:ring-2 focus:ring-[#009688] ${
                 isAlreadyConfirmed
                   ? 'bg-slate-50 dark:bg-[#16223D]/60 border-slate-200 dark:border-slate-800 opacity-75 cursor-not-allowed'
                   : isSelected

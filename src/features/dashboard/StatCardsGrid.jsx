@@ -7,7 +7,7 @@ import { TOTAL_DESK_CAPACITY } from '../../domain/sessions/sessionDefinitions.js
  * Left circular solid color badge + right stats and trend pill
  */
 export function StatCardsGrid() {
-  const { people, enrollments, activeEnrollments, activePeople, trainingDate } = useEnrollment();
+  const { people, enrollments, activeEnrollments, activePeople } = useEnrollment();
 
   // Pure derived calculations driven by active date filter, memoized for high-performance rendering
   const stats = useMemo(() => {
@@ -31,9 +31,10 @@ export function StatCardsGrid() {
       }
     }
 
-    // In Figma mockup, Available Seats shows 14 out of 24 total (or computed)
-    const computedAvailable = Math.max(0, TOTAL_DESK_CAPACITY - totalOccupiedSeats);
-    const availableSeatsCount = (trainingDate === '2025-04-28' && totalOccupiedSeats === 17) ? 14 : computedAvailable;
+    // Available Seats derived purely from capacity minus occupied seats
+    const availableSeatsCount = Math.max(0, TOTAL_DESK_CAPACITY - totalOccupiedSeats);
+    const capacityPct = TOTAL_DESK_CAPACITY > 0 ? Math.round((confirmedCount / TOTAL_DESK_CAPACITY) * 100) : 0;
+    const availablePct = TOTAL_DESK_CAPACITY > 0 ? Math.round((availableSeatsCount / TOTAL_DESK_CAPACITY) * 100) : 0;
 
     return [
     {
@@ -41,7 +42,8 @@ export function StatCardsGrid() {
       label: 'Total People',
       value: totalPeopleCount,
       sublabel: 'Unique individuals',
-      badge: '+12%',
+      badge: `${totalPeopleCount} Active`,
+      badgeStyle: 'text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60 border-teal-200 dark:border-teal-800',
       circleBg: 'bg-[#009688]',
       cardBg: 'bg-white dark:bg-[#131F37]',
       cardBorder: 'border-[#E2E8F0] dark:border-[#1E3150]',
@@ -60,7 +62,8 @@ export function StatCardsGrid() {
       label: 'Confirmed Enrollments',
       value: confirmedCount,
       sublabel: 'Across all sessions',
-      badge: '+8%',
+      badge: `${capacityPct}% Cap`,
+      badgeStyle: 'text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800',
       circleBg: 'bg-[#10B981]',
       cardBg: 'bg-white dark:bg-[#131F37]',
       cardBorder: 'border-[#E2E8F0] dark:border-[#1E3150]',
@@ -79,7 +82,8 @@ export function StatCardsGrid() {
       label: 'Waitlisted Enrollments',
       value: waitlistedCount,
       sublabel: 'Across all sessions',
-      badge: '+50%',
+      badge: `${waitlistedCount} Queued`,
+      badgeStyle: 'text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 border-amber-200 dark:border-amber-800',
       circleBg: 'bg-[#F59E0B]',
       cardBg: 'bg-white dark:bg-[#131F37]',
       cardBorder: 'border-[#E2E8F0] dark:border-[#1E3150]',
@@ -98,7 +102,8 @@ export function StatCardsGrid() {
       label: 'Available Seats',
       value: availableSeatsCount,
       sublabel: `Out of ${TOTAL_DESK_CAPACITY} total`,
-      badge: '+25%',
+      badge: `${availablePct}% Open`,
+      badgeStyle: 'text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 border-blue-200 dark:border-blue-800',
       circleBg: 'bg-[#3B82F6]',
       cardBg: 'bg-white dark:bg-[#131F37]',
       cardBorder: 'border-[#E2E8F0] dark:border-[#1E3150]',
@@ -113,7 +118,7 @@ export function StatCardsGrid() {
       )
     }
   ];
-  }, [activeEnrollments, enrollments, activePeople, people, trainingDate]);
+  }, [activeEnrollments, enrollments, activePeople, people]);
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5">
@@ -158,10 +163,8 @@ export function StatCardsGrid() {
               <span className="text-[11px] text-[#94A3B8] dark:text-slate-400 font-medium truncate">
                 {stat.sublabel}
               </span>
-              <span className="text-[11px] font-bold text-[#10B981] bg-emerald-50 dark:bg-emerald-950/60 px-1.5 sm:px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800 flex items-center shrink-0 whitespace-nowrap">
-                <svg className="w-2.5 h-2.5 mr-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                </svg>
+              <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border flex items-center shrink-0 whitespace-nowrap ${stat.badgeStyle}`}>
+                <span className="w-1.5 h-1.5 rounded-full mr-1 bg-current opacity-75" />
                 {stat.badge}
               </span>
             </div>
